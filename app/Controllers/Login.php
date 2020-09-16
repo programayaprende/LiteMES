@@ -10,8 +10,13 @@ class Login extends BaseController
     
     public function index()
 	{
+        if(!session()->get('loc')){
+            $temp_data['loc'] = "es";
+            session()->set($temp_data);
+        }
+        
         if(session()->get('isLoggedIn')){
-            header("Location: ".base_url('/dashboard'));
+            header("Location: ".base_url('/Dashboard'));
             exit;
         }
         return view('login');
@@ -55,6 +60,19 @@ class Login extends BaseController
         }
     }
 
+    public function CloseSession(){
+        if(session()->get('isLoggedIn')){
+            $data['loc'] = session()->get('loc');
+        } else {
+            $data['loc'] = "en";
+        }
+        session()->destroy();
+        session()->set($data);
+
+        header("Location: ".base_url('/Login'));
+        die();
+    }
+
     private function createSession($user){
         $data = [
             'email' => $user['email'],
@@ -62,6 +80,7 @@ class Login extends BaseController
             'last_name' => $user['last_name'],
             'isLoggedIn' => true,
             'ip_address' => $_SERVER['REMOTE_ADDR'],
+            'loc' => session()->get('loc'),
         ];
 
         session()->set($data);

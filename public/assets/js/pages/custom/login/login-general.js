@@ -71,7 +71,7 @@ var KTLogin = function() {
 						}
 
 						swal.fire({
-							text: "Login success",
+							text: lang.loginSuccess,
 							icon: "success",
 							buttonsStyling: false,
 							confirmButtonText: "Ok, got it!",
