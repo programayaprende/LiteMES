@@ -81,7 +81,7 @@ var KTLogin = function() {
 						}).then(function() {
 							//Go To Dashboard
 							KTUtil.scrollTop();
-							window.location.href = "dashboard";
+							window.location.href = "Dashboard";
 						});
 
 					}, 'json');
