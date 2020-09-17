@@ -8,4 +8,8 @@ class UIComponents {
     public function TopMenu(){
         return view("templates/topmenu");
     }
+
+    public function UserPanel(){
+        return view("templates/user_panel");
+    }
 }

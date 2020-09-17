@@ -168,7 +168,7 @@
 								</div>
 								<!--end::Search-->								
 								<!--begin::Quick panel-->
-								<div class="topbar-item">
+								<div class="topbar-item" style="display:none;">
 									<div class="btn btn-icon btn-clean btn-lg mr-1" id="kt_quick_panel_toggle">
 										<span class="svg-icon svg-icon-xl svg-icon-primary">
 											<!--begin::Svg Icon | path:assets/media/svg/icons/Layout/Layout-4-blocks.svg-->
@@ -214,7 +214,7 @@
 											?>
 											<!--begin::Item-->
 											<li class="navi-item">
-												<a href="#" class="navi-link">
+												<a href="<?=base_url("Dashboard/setLanguage/".$lang['loc'])?>" class="navi-link">
 													<span class="symbol symbol-20 mr-3">
 														<img src="assets/media/svg/flags/<?= $lang['icon']?>" alt="" />
 													</span>

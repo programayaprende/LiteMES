@@ -11,4 +11,9 @@ class Dashboard extends SecureController{
         echo view("templates/footer",$data);
 
     }
+
+    public function setLanguage($lang){        
+        session()->set('loc',$lang);        
+        return redirect()->to(base_url('Dashboard'));
+    }
 }

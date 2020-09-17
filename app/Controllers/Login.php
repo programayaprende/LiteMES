@@ -11,7 +11,7 @@ class Login extends BaseController
     public function index()
 	{
         if(!session()->get('loc')){
-            $temp_data['loc'] = "es";
+            $temp_data['loc'] = "en";
             session()->set($temp_data);
         }
         
