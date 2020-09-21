@@ -12,20 +12,29 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
 		<!--end::Fonts-->
 		<!--begin::Page Vendors Styles(used by this page)-->
-		<link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
 		<!--end::Page Vendors Styles-->
+		<!--begin::Page Custom Styles(used by this page)-->
+		<?php
+		if(isset($style_files)){
+			foreach($style_files as $style_file){
+				echo $style_file;
+			}
+		}
+		?>
+		<!--end::Page Custom Styles-->
 		<!--begin::Global Theme Styles(used by all pages)-->
-		<link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
-		<link href="assets/plugins/custom/prismjs/prismjs.bundle.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/plugins/custom/prismjs/prismjs.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 		<!--end::Global Theme Styles-->
 		<!--begin::Layout Themes(used by all pages)-->
-		<link href="assets/css/themes/layout/header/base/light.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/themes/layout/header/menu/light.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/themes/layout/brand/dark.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/header/base/light.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/header/menu/light.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/brand/dark.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css" />
 		<!--end::Layout Themes-->
-		<link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
+		<link rel="shortcut icon" href="<?=base_url()?>/assets/media/logos/favicon.ico" />
 	</head>
 	<!--end::Head-->
 	<!--begin::Body-->
@@ -34,8 +43,8 @@
 		<!--begin::Header Mobile-->
 		<div id="kt_header_mobile" class="header-mobile align-items-center header-mobile-fixed">
 			<!--begin::Logo-->
-			<a href="<?=base_url("/Dashboard")?>">
-				<img alt="Logo" src="assets/media/logos/logo-light.png" />
+			<a href="<?=base_url("Dashboard")?>">
+				<img alt="Logo" src="<?=base_url()?>/assets/media/logos/logo-light.png" />
 			</a>
 			<!--end::Logo-->
 			<!--begin::Toolbar-->
@@ -78,7 +87,7 @@
 					<div class="brand flex-column-auto" id="kt_brand">
 						<!--begin::Logo-->
 						<a href="<?=base_url("/Dashboard")?>" class="brand-logo">
-							<img alt="Logo" src="assets/media/logos/logo-light.png" />
+							<img alt="Logo" src="<?=base_url()?>/assets/media/logos/logo-light.png" />
 						</a>
 						<!--end::Logo-->
 						<!--begin::Toggle-->
@@ -198,7 +207,7 @@
 									<!--begin::Toggle-->
 									<div class="topbar-item" data-toggle="dropdown" data-offset="10px,0px">
 										<div class="btn btn-icon btn-clean btn-dropdown btn-lg mr-1">
-											<img class="h-20px w-20px rounded-sm" src="assets/media/svg/flags/<?= $lang['icon']?>" alt="" />
+											<img class="h-20px w-20px rounded-sm" src="<?=base_url()?>/assets/media/svg/flags/<?= $lang['icon']?>" alt="" />
 										</div>
 									</div>
 									<!--end::Toggle-->
@@ -216,7 +225,7 @@
 											<li class="navi-item">
 												<a href="<?=base_url("Dashboard/setLanguage/".$lang['loc'])?>" class="navi-link">
 													<span class="symbol symbol-20 mr-3">
-														<img src="assets/media/svg/flags/<?= $lang['icon']?>" alt="" />
+														<img src="<?=base_url()?>/assets/media/svg/flags/<?= $lang['icon']?>" alt="" />
 													</span>
 													<span class="navi-text"><?= $lang['title']?></span>
 												</a>

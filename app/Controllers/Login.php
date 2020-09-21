@@ -46,8 +46,7 @@ class Login extends BaseController
 
             if(!$this->validate($rules,$errors)){
                 $data['errors'] = $this->validator->listErrors();
-                $data['error'] = 1;
-                $data['validation'] = $this->validator;
+                $data['error'] = 1;                
             } else {
                 $model = new UserModel();
                 $user = $model->where('email',$this->request->getVar('email'))
