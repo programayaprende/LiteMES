@@ -1,0 +1,16 @@
+CREATE TABLE `ma_users` (
+  `user_name` varchar(20) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `password` varchar(50) DEFAULT NULL,
+  `locked` int(11) DEFAULT 0,
+  `approved` int(11) DEFAULT 0,
+  `last_login` datetime DEFAULT NULL,
+  `login_attempts` int(11) DEFAULT 0,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `job_description` varchar(100) DEFAULT NULL,
+  `contact_phone` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`user_name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
