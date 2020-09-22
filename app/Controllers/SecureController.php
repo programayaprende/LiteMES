@@ -35,7 +35,12 @@ class SecureController extends Controller
         // $this->session = \Config\Services::session();
         
         if(!session()->get('isLoggedIn')){
-            header("Location: ".base_url("/Login"));
+			
+			//Guarda el registro del intento
+			///
+			//
+			
+			header("Location: ".base_url("/Login"));
             die();
         }
 	}

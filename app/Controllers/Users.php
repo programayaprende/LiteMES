@@ -15,7 +15,7 @@ class Users extends SecureController{
         echo view("templates/header",$data);
         //echo view("users/user_form",$data);
         echo view("templates/footer",$data);
-
+        
     }
 
     public function GetUserData($user_name){
@@ -29,7 +29,7 @@ class Users extends SecureController{
                 $json['_FILES'] = $_FILES;
             }
 
-            if(!$this->request->getVar('user_name')){
+            if(!$user_name){
                 $json['error'] = 0;
                 $json['errors'] = [
                     'user_name' => 'Please provide a valid user_name',
@@ -46,7 +46,7 @@ class Users extends SecureController{
                     $json['lists_errors'] = '<ul><li>'.'Please provide a valid user_name'.'</li></ul>';
                 } else {
                     unset($userData['password']);
-                    $json['user_data'] = $userData;
+                    $json['user_data'] = $userData[0];
                 }
             }
 

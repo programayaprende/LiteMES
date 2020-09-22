@@ -87,6 +87,7 @@ var KTUserEdit = function () {
     }
     
     var getUserInfo = function(user_name){
+        console.log("user_name: " + user_name);
         $.ajax({
             url: BASE_URL + "/Users/GetUserData/" + user_name,
             type: "post",
@@ -130,6 +131,7 @@ var KTUserEdit = function () {
                     initNewUserForm();
                     break;
                 case "edit":
+                    console.log("edit:" + REQUEST_USER_NAME);
                     initEditUserForm();
                     getUserInfo(REQUEST_USER_NAME);
                     break;
