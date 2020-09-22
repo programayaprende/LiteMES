@@ -63,7 +63,9 @@ var KTUserEdit = function () {
                         }
                     }).then(function() {
                         KTUtil.scrollTop();
-                        window.location = BASE_URL + "/Users/Edit/" + res.user_name;
+                        //window.location = BASE_URL + "/Users/Edit/" + res.user_name;
+                        KTUserEdit.initUser(res.user_name);
+                        history.pushState({action: "edit",user_name: res.user_name}, 'Edit User', './Users/Edit/' + res.user_name);
                     });
                     return;
                 }
@@ -129,11 +131,13 @@ var KTUserEdit = function () {
             switch (DEFAULT_ACTION) {
                 case "new":
                     initNewUserForm();
+                    history.replaceState({action: "new"}, 'Default state', './Users/New');
                     break;
                 case "edit":
                     console.log("edit:" + REQUEST_USER_NAME);
                     initEditUserForm();
                     getUserInfo(REQUEST_USER_NAME);
+                    history.replaceState({action: "edit",user_name: REQUEST_USER_NAME}, 'Default state', './Users/Edit/' + REQUEST_USER_NAME);
                     break;
                 default:
                     break;
