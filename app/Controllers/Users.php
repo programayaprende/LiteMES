@@ -36,8 +36,8 @@ class Users extends SecureController{
                 ];
                 $json['lists_errors'] = '<ul><li>'.'Please provide a valid user_name'.'</li></ul>';                
             } else {
-                $user = new UserModel();
-                $userData = $user->find($this->request->getVar('user_name'));
+                $user = new UserModel();                
+                $userData = $user->find($user_name);                
                 if(!$userData){
                     $json['error'] = 1;
                     $json['errors'] = [
@@ -46,7 +46,7 @@ class Users extends SecureController{
                     $json['lists_errors'] = '<ul><li>'.'Please provide a valid user_name'.'</li></ul>';
                 } else {
                     unset($userData['password']);
-                    $json['user_data'] = $userData[0];
+                    $json['user_data'] = $userData;
                 }
             }
 
@@ -66,7 +66,7 @@ class Users extends SecureController{
             }
 
             if(!$this->request->getVar('user_name')){
-                $json['error'] = 0;
+                $json['error'] = 1;
                 $json['errors'] = [
                     'user_name' => 'Please provide a valid user_name',
                 ];
@@ -81,8 +81,37 @@ class Users extends SecureController{
                     ];
                     $json['lists_errors'] = '<ul><li>'.'Please provide a valid user_name'.'</li></ul>';
                 } else {
-                    unset($userData['password']);
-                    $json['user_data'] = $userData;
+                    
+                    $rules = [
+                        'first_name' => 'required|min_length[3]|max_length[20]',
+                        'last_name' =>  'required|min_length[3]|max_length[20]',
+                        'job_description' =>  'required|min_length[3]|max_length[20]',                
+                        'email' =>  'required|min_length[6]|max_length[50]|valid_email',
+                    ];
+
+                    if(!$this->validate($rules)){                
+                        $json['error'] = 1;
+                        $json['errors'] = $this->validator->getErrors();
+                        $json['lists_errors'] = $this->validator->listErrors();
+                    } else {
+                                               
+                        $userNewData = [                            
+                            "first_name" => $this->request->getVar('first_name'),
+                            "last_name" => $this->request->getVar('last_name'),
+                            "job_description" => $this->request->getVar('job_description'),
+                            "email" => $this->request->getVar('email'),                            
+                            "contact_phone" => $this->request->getVar('contact_phone'),
+                        ];
+                    
+                        //Paso la validacion
+                        $user->update($this->request->getVar('user_name'),$userNewData);
+                        
+                        $json['user_name'] = $this->request->getVar('user_name');
+                        $json['message'] = "New user added succesfully";
+                        
+                    }
+                    
+                    
                 }
             }
 
