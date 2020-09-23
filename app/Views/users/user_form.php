@@ -25,12 +25,12 @@
 									<!--end::Button-->
 									<!--begin::Dropdown-->
 									<div class="btn-group ml-2">
-										<button type="button" class="btn btn-primary font-weight-bold btn-sm px-3 font-size-base" id="btn_save_continue">Save Changes</button>
+										<button type="button" class="btn btn-primary font-weight-bold btn-sm px-3 font-size-base" id="btn_save_and_continue">Save Changes</button>
 										<button type="button" class="btn btn-primary font-weight-bold btn-sm px-3 font-size-base dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
 										<div class="dropdown-menu dropdown-menu-sm p-0 m-0 dropdown-menu-right">
 											<ul class="navi py-5">
 												<li class="navi-item">
-													<a href="#" class="navi-link" id="btn_save_add_new">
+													<a href="javascript://" class="navi-link" id="btn_save_and_add">
 														<span class="navi-icon">
 															<i class="flaticon2-medical-records"></i>
 														</span>
@@ -38,7 +38,7 @@
 													</a>
 												</li>
 												<li class="navi-item">
-													<a href="#" class="navi-link" id="btn_save_exit">
+													<a href="javascript://" class="navi-link" id="btn_save_and_exit">
 														<span class="navi-icon">
 															<i class="flaticon2-hourglass-1"></i>
 														</span>
@@ -114,7 +114,8 @@
 									<!--begin::Card body-->
 									<div class="card-body">
 										<form class="form" id="kt_form" method="post" enctype="multipart/form-data">
-											<input type="hidden" name="action" value="new" id="action">
+											<input type="hidden" name="action" id="action" value="">
+											<input type="hidden" name="after_action" id="after_action" value="save_and_continue">
 											<div class="tab-content">
 												<!--begin::Tab-->
 												<div class="tab-pane show active px-7" id="kt_user_edit_tab_1" role="tabpanel">

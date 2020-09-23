@@ -7,8 +7,17 @@ var KTUserEdit = function () {
 
     var initToolbar = function() {
         console.log("initToolbar");
-        $("#btn_save_continue").on("click",function(){            
+        $("#btn_save_and_continue").on("click",function(){            
+            $("#after_action").val("save_and_continue");
             $("#kt_form").submit();
+        });
+        $("#btn_save_and_add").on("click",function(){            
+            $("#after_action").val("save_and_add");
+            $("#kt_form").submit();
+        });
+        $("#btn_save_and_exit").on("click",function(){            
+            $("#after_action").val("save_and_exit");
+            $("#kt_form").submit();            
         });
     }
     
@@ -64,10 +73,22 @@ var KTUserEdit = function () {
                         }
                     }).then(function() {
                         KTUtil.scrollTop();
-                        if($("#action").val()=="new"){
-                            history.pushState({action: "edit",user_name: res.user_name}, 'Edit User', '/Users/Edit/' + res.user_name);
-                        }
-                        KTUserEdit.initUser(res.user_name);                        
+                        console.log($("#after_action").val());
+                        switch($("#after_action").val()){
+                            case "save_and_continue":
+                                if($("#action").val()=="new"){
+                                    history.pushState({action: "edit",user_name: res.user_name}, 'Edit User', '/Users/Edit/' + res.user_name);
+                                }
+                                KTUserEdit.initUser(res.user_name);
+                                break;
+                            case "save_and_add":
+                                KTUserEdit.initNew();
+                                break;
+                            case "save_and_exit":
+                                window.location = BASE_URL + "/Users";                             
+                                break;                            
+                        }                        
+                        
                     });
                     return;
                 }
