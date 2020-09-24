@@ -23,19 +23,72 @@ class Users extends SecureController{
 
     public function GetUsers(){
         
-        $model = new UserModel();
+        $userModel = new UserModel();
         
-        $data = $alldata = $model->findAll();
+        $data = $alldata = $userModel->findAll();
 
         //Datos enviados por DataTable
         $datatable = array_merge(array('pagination' => array(), 'sort' => array(), 'query' => array()), $_REQUEST);
 
+        //Inicializar el constructor del query
+        $dataBuilder = $userModel->builder();
+        $dataBuilder->select('user_name,email,first_name,last_name,locked,approved,last_login,created_at,job_description,contact_phone');
+
         // Se mando un filtro desde la cabecera del modulo
         $filter = isset($datatable['query']['generalSearch']) && is_string($datatable['query']['generalSearch']) ? $datatable['query']['generalSearch'] : '';
         if (!empty($filter)) {
-        
+            $dataBuilder->like('user_name',$filter);
+            $dataBuilder->like('first_name',$filter);
+            $dataBuilder->like('last_name',$filter);            
             unset($datatable['query']['generalSearch']);
         }
+
+        // Si se mandan filstros por columnas
+        $query = isset($datatable['query']) && is_array($datatable['query']) ? $datatable['query'] : null;
+        if (is_array($query)) {
+            $query = array_filter($query);
+            foreach ($query as $key => $val) {
+                $dataBuilder->like($key,$val);
+            }
+        }
+
+        //Checar si se mando info para el sort
+        $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'asc';
+        $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'user_name';
+
+        //Aplicar el sort en el query
+        $dataBuilder->orderBy($field, $sort);
+
+        //Revisar que pagina quieren ver        
+        $page = !empty($datatable['pagination']['page']) ? (int)$datatable['pagination']['page'] : 1;
+        //Revisar cuantos items por pagina
+        $perpage = !empty($datatable['pagination']['perpage']) ? (int)$datatable['pagination']['perpage'] : -1;
+
+        $pages = 1;
+        $total = $dataBuilder->countAllResults(false);
+
+        if ($perpage > 0) {
+            $pages = ceil($total / $perpage); // calculate total pages
+            $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
+            $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
+            $offset = ($page - 1) * $perpage;
+            if ($offset < 0) {
+                $offset = 0;
+            }                        
+            $selectQuery = $dataBuilder->limit($perpage, $offset);
+        }
+
+        $selectQuery =  $dataBuilder->getCompiledSelect(false);
+
+        $data = [];
+        $data = $dataBuilder->get()->getResultArray();;
+
+        $meta = array(
+            'page' => $page,
+            'pages' => $pages,
+            'perpage' => $perpage,
+            'total' => $total,
+        );
 
         //$_REQUEST['query']['generalSearch'] es para la busqueda rapida de la cabecera de la pagina
         //$_REQUEST['pagination']['page'] page requerida
@@ -45,9 +98,13 @@ class Users extends SecureController{
         //$_REQUEST['sort']['field'] campo para sortear
         //$_REQUEST['sort']['sort'] orden del sorteo
 
-
-        $result = array(
-            'REQUEST' => $_REQUEST,
+        $result = array(            
+            'select' => $selectQuery,            
+            'REQUEST' => $_REQUEST,            
+            'meta' => $meta + array(
+                'sort' => $sort,
+                'field' => $field,
+            ),
             'data' => $data
         );
         
