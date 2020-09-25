@@ -23,8 +23,9 @@ var KTAppsUsersListDatatable = function() {
 
 			// layout definition
 			layout: {
-				scroll: false, // enable/disable datatable scroll both horizontal and vertical when needed.
+				scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
 				footer: false, // display/hide footer
+				minHeight: 500,
 			},
 
 			// column sorting
