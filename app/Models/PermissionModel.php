@@ -2,9 +2,9 @@
   
 use CodeIgniter\Model;
   
-class PermitModel extends Model
+class PermissionModel extends Model
 {
-    protected $table = 'ma_permits';
+    protected $table = 'ma_permissions';
     protected $primaryKey = 'id';                    
     protected $allowedFields = [
         'description_location',        

@@ -100,7 +100,7 @@ class Users extends SecureController{
         
         $userModel = new UserModel();
         $extra = [];
-        //$extra['segment'] =  $this->request->uri->getSegment(2);
+        $extra['permission'] =  $this->permissions->hasPermission('andrew','Users','GetUsers');
         
         $data = $alldata = $userModel->findAll();
 

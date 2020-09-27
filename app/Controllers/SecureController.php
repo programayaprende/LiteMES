@@ -8,6 +8,7 @@ namespace App\Controllers;
  */
 
 use CodeIgniter\Controller;
+use App\Libraries\Permissions;
 
 class SecureController extends Controller
 {
@@ -19,6 +20,8 @@ class SecureController extends Controller
 	 * @var array
 	 */
 	protected $helpers = [];
+
+	protected $permissions; 
 
 	/**
 	 * Constructor.
@@ -35,13 +38,10 @@ class SecureController extends Controller
         // $this->session = \Config\Services::session();
         
         if(!session()->get('isLoggedIn')){
-			
-			//Guarda el registro del intento
-			///
-			//
-			
 			header("Location: ".base_url("/Login"));
             die();
-        }
+		}
+		
+		$this->permissions = new Permissions();
 	}
 }

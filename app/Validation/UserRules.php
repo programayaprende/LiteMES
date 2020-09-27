@@ -5,6 +5,7 @@ use App\Models\UserModel;
 
 class UserRules{
 
+    //Revisa si el usuario y contraseña son validos
     public function validateUser(string $str, string $fields, array $data){
         $model = new UserModel();
 
