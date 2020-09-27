@@ -271,15 +271,7 @@
 																</i>
 																<span class="menu-text">Add User</span>
 															</a>
-														</li>
-														<li class="menu-item" aria-haspopup="true">
-															<a href="custom/apps/user/edit-user.html" class="menu-link">
-																<i class="menu-bullet menu-bullet-dot">
-																	<span></span>
-																</i>
-																<span class="menu-text">Edit User</span>
-															</a>
-														</li>														
+														</li>																												
 													</ul>
 												</div>
 											</li>
@@ -313,15 +305,7 @@
 																</i>
 																<span class="menu-text">Add Role</span>
 															</a>
-														</li>
-														<li class="menu-item" aria-haspopup="true">
-															<a href="custom/apps/user/edit-user.html" class="menu-link">
-																<i class="menu-bullet menu-bullet-dot">
-																	<span></span>
-																</i>
-																<span class="menu-text">Edit Role</span>
-															</a>
-														</li>														
+														</li>																											
 													</ul>
 												</div>
 											</li>

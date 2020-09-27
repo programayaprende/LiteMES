@@ -13,7 +13,15 @@
 									<!--end::Separator-->
 									<!--begin::Search Form-->
 									<div class="d-flex align-items-center" id="kt_subheader_search">
-										<span class="text-dark-50 font-weight-bold" id="main_subtitle"></span>
+										<ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
+											<li class="breadcrumb-item">
+												<a href="<?= base_url("Users")?>" class="text-muted">Users</a>
+											</li>
+											<li class="breadcrumb-item">
+												<a href="" class="text-muted" id="main_subtitle">-</a>
+											</li>											
+										</ul>
+										<span class="text-dark-50 font-weight-bold" ></span>
 									</div>
 									<!--end::Search Form-->
 								</div>

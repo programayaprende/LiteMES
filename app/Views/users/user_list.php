@@ -12,9 +12,8 @@
 									<div class="subheader-separator subheader-separator-ver mt-2 mb-2 mr-5 bg-gray-200"></div>
 									<!--end::Separator-->
 									<!--begin::Search Form-->
-									<div class="d-flex align-items-center" id="kt_subheader_search">
-										<span class="text-dark-50 font-weight-bold" id="kt_subheader_total">? Total</span>
-										<form class="ml-5">
+									<div class="d-flex align-items-center" id="kt_subheader_search">										
+										<form class="">
 											<div class="input-group input-group-sm input-group-solid" style="max-width: 175px">
 												<input type="text" class="form-control" id="kt_subheader_search_form" placeholder="Search..." />
 												<div class="input-group-append">
@@ -75,9 +74,9 @@
 						<div class="d-flex flex-column-fluid">
 							<!--begin::Container-->
 							<div class="container-fluid"> <!---fluid-->								
-								<div class="row" data-sticky-container="">
+								<div class="row">
 									<div class="col-lg-3 col-xl-2">
-										<div class="card card-custom sticky" data-sticky="true" data-margin-top="140px" data-sticky-class="sticky">
+										<div class="card card-custom ">
 											<div class="card-header " style="padding-left:20px; padding-right:20px;">
 												<div class="card-title">
 													<span class="card-icon">
@@ -86,39 +85,36 @@
 													<h3 class="card-label">Filters</h3>
 												</div>
 												<div class="card-toolbar">
-													<a href="#" class="btn btn-sm btn-light-primary font-weight-bold">
-													Apply</a>
+													<button class="btn btn-sm btn-light-primary font-weight-bold" id="btn_filter">
+													Apply</button>
 												</div>
 											</div>											
 											<div class="card-body" style="padding-left:20px; padding-right:20px;">
-												<div class="form-group">
-													<label>Email address</label>
-													<input type="email" class="form-control"  placeholder="Enter email"/>													
+												<div class="form-group ">
+													<label class="col-form-label">Registration Date</label>
+													<input class="form-control" id="kt_daterangepicker_1" readonly="readonly" placeholder="Select" type="text">													
 												</div>
 												<div class="form-group">
-													<label for="exampleSelect1">Example select</label>
-													<select class="form-control" id="exampleSelect1">
-													<option>1</option>
-													<option>2</option>
-													<option>3</option>
-													<option>4</option>
-													<option>5</option>
+													<label for="filter_name">Name</label>
+													<input type="text" class="form-control" id="filter_name"  placeholder="Enter user name"/>
+												</div>
+												<div class="form-group">
+													<label for="filter_approved">Approved</label>
+													<select class="form-control" id="filter_approved">
+													<option value="">All</option>
+													<option value="1">Approved</option>
+													<option value="0">Pending</option>
 													</select>
 												</div>
 												<div class="form-group">
-													<label for="exampleSelect2">Example multiple select</label>
-													<select multiple="" class="form-control" id="exampleSelect2">
-													<option>1</option>
-													<option>2</option>
-													<option>3</option>
-													<option>4</option>
-													<option>5</option>
+													<label for="filter_locked">Status</label>
+													<select class="form-control" id="filter_locked">
+													<option value="">All</option>
+													<option value="1">Locked</option>
+													<option value="0">Active</option>
 													</select>
 												</div>
-												<div class="form-group">
-													<label for="example-date-input">Date</label>													
-													<input class="form-control" type="date" value="2011-08-19" id="example-date-input"/>													
-												</div>
+												
 											</div>
 										</div>
 									</div>

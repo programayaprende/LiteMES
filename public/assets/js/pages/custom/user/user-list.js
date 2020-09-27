@@ -9,6 +9,7 @@ var KTAppsUsersListDatatable = function() {
 		var datatable = $('#kt_datatable').KTDatatable({
 			// datasource definition
 			data: {
+				saveState : false,
 				type: 'remote',
 				source: {
 					read: {
@@ -44,8 +45,8 @@ var KTAppsUsersListDatatable = function() {
 				{
 					field: 'user_name',
 					title: 'Username',
-					sortable: 'asc',
-					width: 250,
+					width: 'auto',
+					sortable: 'asc',					
 					type: 'number',
 					selector: false,
 					textAlign: 'left',
@@ -53,13 +54,12 @@ var KTAppsUsersListDatatable = function() {
 						return '<span class="font-weight-bolder">' + data.user_name + '</span>';
 					}
 				}, {
-					field: 'first_name',
-					title: 'First Name',
-					width: 250,
+					field: 'full_name',
+					title: 'Name',
+					width: 'auto',
 					template: function(data) {
 						var number = KTUtil.getRandomInt(1, 14);
 						var user_img = '100_' + number + '.jpg';
-
 						var output = '';
 						if (number > 8) {
 							output = '<div class="d-flex align-items-center">\
@@ -67,8 +67,8 @@ var KTAppsUsersListDatatable = function() {
 									<img class="" src="assets/media/users/' + user_img + '" alt="photo">\
 								</div>\
 								<div class="ml-4">\
-									<div class="text-dark-75 font-weight-bolder font-size-lg mb-0">' + data.first_name + '</div>\
-									<a href="#" class="text-muted font-weight-bold text-hover-primary">' + data.email + '</a>\
+									<div class="text-dark-75 font-weight-bolder font-size-lg mb-0">' + data.first_name + ' ' + data.last_name + '</div>\
+									' + data.email + '\
 								</div>\
 							</div>';
 						}
@@ -90,44 +90,23 @@ var KTAppsUsersListDatatable = function() {
 									<span class="symbol-label font-size-h4 font-weight-bold">' + data.first_name.substring(0, 1) + '</span>\
 								</div>\
 								<div class="ml-4">\
-									<div class="text-dark-75 font-weight-bolder font-size-lg mb-0">' + data.first_name + '</div>\
-									<a href="#" class="text-muted font-weight-bold text-hover-primary">' + data.email + '</a>\
+									<div class="text-dark-75 font-weight-bolder font-size-lg mb-0">' + data.first_name + ' ' + data.last_name + '</div>\
+									' + data.email + '\
 								</div>\
 							</div>';
 						}
 
 						return output;
 					}
-				}, {
-					field: 'last_name',
-					title: 'Last Name',
-					template: function(row) {
-						var output = '';
-
-						output += '<div class="font-weight-bolder font-size-lg mb-0">' + row.last_name + '</div>';
-						output += '<div class="font-weight-bold text-muted">Code: ' + row.last_name.substring(0, 2) + '</div>';
-
-						return output;
-					}
-				}, {
+				},  {
 					field: 'created_at',
-					title: 'Since',
+					title: 'Registered',
 					type: 'date',
-					format: 'MM/DD/YYYY',
+					width: 'auto',
+					format: 'YYYY-MM-DD',
 					template: function(row) {
-						var output = '';
-
-						var status = {
-							1: {'title': 'Paid', 'class': ' label-light-primary'},
-							2: {'title': 'Approved', 'class': ' label-light-danger'},
-							3: {'title': 'Pending', 'class': ' label-light-primary'},
-							4: {'title': 'Rejected', 'class': ' label-light-success'}
-						};
-						var index = KTUtil.getRandomInt(1, 4);
-
+						var output = '';						
 						output += '<div class="font-weight-bolder text-primary mb-0">' + row.created_at + '</div>';
-						output += '<div class="text-muted">' + status[index].title + '</div>';
-
 						return output;
 					},
 				}, {
@@ -143,22 +122,32 @@ var KTAppsUsersListDatatable = function() {
 				}, {
 					field: 'approved',
 					title: 'Approved',
-					// callback function support for column rendering
+					width: 'auto',					
 					template: function(row) {
 						var status = {
 							0: {'title': 'Pending', 'class': ' label-light-primary'},
-							1: {'title': 'Success', 'class': ' label-light-success'},							
+							1: {'title': 'Approved', 'class': ' label-light-success'},							
 						};
 						return '<span class="label label-lg font-weight-bold ' + status[row.approved].class + ' label-inline">' + status[row.approved].title + '</span>';
+					},
+				},{
+					field: 'status',
+					title: 'Status',
+					width: 'auto',					
+					template: function(row) {
+						var status = {
+							0: {'title': 'Active', 'class': ' label-light-success'},
+							1: {'title': 'Locked', 'class': ' label-light-danger'},							
+						};
+						return '<span class="label label-lg font-weight-bold ' + status[row.locked].class + ' label-inline">' + status[row.locked].title + '</span>';
 					},
 				}, {
 					field: 'Actions',
 					title: 'Actions',
-					sortable: false,
-					width: 130,
+					sortable: false,					
 					overflow: 'visible',
 					autoHide: false,
-					template: function() {
+					template: function(row) {
 						return '\
 	                        <div class="dropdown dropdown-inline">\
 	                            <a href="javascript:;" class="btn btn-sm btn-default btn-text-primary btn-hover-primary btn-icon mr-2" data-toggle="dropdown">\
@@ -178,39 +167,27 @@ var KTAppsUsersListDatatable = function() {
 	                                        Choose an action:\
 	                                    </li>\
 	                                    <li class="navi-item">\
-	                                        <a href="#" class="navi-link">\
+	                                        <a href="javascript: quickEdit(\'' + row.user_name + '\',\'Approve\')" class="navi-link">\
 	                                            <span class="navi-icon"><i class="la la-print"></i></span>\
-	                                            <span class="navi-text">Print</span>\
+	                                            <span class="navi-text">Approve</span>\
 	                                        </a>\
 	                                    </li>\
 	                                    <li class="navi-item">\
-	                                        <a href="#" class="navi-link">\
+	                                        <a href="javascript: quickEdit(\'' + row.user_name + '\',\'Lock\')" class="navi-link">\
 	                                            <span class="navi-icon"><i class="la la-copy"></i></span>\
-	                                            <span class="navi-text">Copy</span>\
+	                                            <span class="navi-text">Lock User</span>\
 	                                        </a>\
 	                                    </li>\
 	                                    <li class="navi-item">\
-	                                        <a href="#" class="navi-link">\
+	                                        <a href="javascript: quickEdit(\'' + row.user_name + '\',\'Unlock\')" class="navi-link">\
 	                                            <span class="navi-icon"><i class="la la-file-excel-o"></i></span>\
-	                                            <span class="navi-text">Excel</span>\
-	                                        </a>\
-	                                    </li>\
-	                                    <li class="navi-item">\
-	                                        <a href="#" class="navi-link">\
-	                                            <span class="navi-icon"><i class="la la-file-text-o"></i></span>\
-	                                            <span class="navi-text">CSV</span>\
-	                                        </a>\
-	                                    </li>\
-	                                    <li class="navi-item">\
-	                                        <a href="#" class="navi-link">\
-	                                            <span class="navi-icon"><i class="la la-file-pdf-o"></i></span>\
-	                                            <span class="navi-text">PDF</span>\
+	                                            <span class="navi-text">Active User</span>\
 	                                        </a>\
 	                                    </li>\
 	                                </ul>\
 	                            </div>\
 	                        </div>\
-	                        <a href="javascript:;" class="btn btn-sm btn-default btn-text-primary btn-hover-primary btn-icon mr-2" title="Edit details">\
+	                        <a href="javascript: window.location= BASE_URL + \'/Users/Edit/' + row.user_name + '\' ;" class="btn btn-sm btn-default btn-text-primary btn-hover-primary btn-icon mr-2" title="Edit details">\
 	                            <span class="svg-icon svg-icon-md">\
 									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">\
 										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\
@@ -221,31 +198,42 @@ var KTAppsUsersListDatatable = function() {
 									</svg>\
 	                            </span>\
 	                        </a>\
-	                        <a href="javascript:;" class="btn btn-sm btn-default btn-text-primary btn-hover-primary btn-icon" title="Delete">\
-								<span class="svg-icon svg-icon-md">\
-									<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">\
-										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\
-											<rect x="0" y="0" width="24" height="24"/>\
-											<path d="M6,8 L6,20.5 C6,21.3284271 6.67157288,22 7.5,22 L16.5,22 C17.3284271,22 18,21.3284271 18,20.5 L18,8 L6,8 Z" fill="#000000" fill-rule="nonzero"/>\
-											<path d="M14,4.5 L14,4 C14,3.44771525 13.5522847,3 13,3 L11,3 C10.4477153,3 10,3.44771525 10,4 L10,4.5 L5.5,4.5 C5.22385763,4.5 5,4.72385763 5,5 L5,5.5 C5,5.77614237 5.22385763,6 5.5,6 L18.5,6 C18.7761424,6 19,5.77614237 19,5.5 L19,5 C19,4.72385763 18.7761424,4.5 18.5,4.5 L14,4.5 Z" fill="#000000" opacity="0.3"/>\
-										</g>\
-									</svg>\
-								</span>\
-	                        </a>\
 	                    ';
 					},
 				}],
 		});
+		
+		$("#btn_filter").on('click',function(){
+			
+			var filters = [];
 
-		$('#kt_datatable_search_status').on('change', function() {
-			datatable.search($(this).val().toLowerCase(), 'Status');
+			if($("#kt_daterangepicker_1").val().length>0){				
+				datatable.setDataSourceParam('filter_registrationRange', $("#kt_daterangepicker_1").val().toLowerCase());
+			} else {
+				datatable.setDataSourceParam('filter_registrationRange',null);
+			}
+			
+			if($("#filter_name").val()!=""){				
+				datatable.setDataSourceParam('filter_name', $("#filter_name").val().toLowerCase());
+			} else {
+				datatable.setDataSourceParam('filter_name',null);
+			}
+
+			if($("#filter_approved").val()!=""){
+				datatable.setDataSourceParam('filter_approved', $("#filter_approved").val().toLowerCase());
+			} else {
+				datatable.setDataSourceParam('filter_approved', null);
+			}
+			
+			if($("#filter_locked").val()!=""){
+				datatable.setDataSourceParam('filter_locked', $("#filter_locked").val().toLowerCase());
+			} else {
+				datatable.setDataSourceParam('filter_locked', null);
+			}
+
+			datatable.load();
+						
 		});
-
-		$('#kt_datatable_search_type').on('change', function() {
-			datatable.search($(this).val().toLowerCase(), 'Type');
-		});
-
-		$('#kt_datatable_search_status, #kt_datatable_search_type').selectpicker();
 	};
 
 	return {
@@ -256,6 +244,79 @@ var KTAppsUsersListDatatable = function() {
 	};
 }();
 
+var KTBootstrapDaterangepicker = function () {
+
+    // Private functions
+    var setupDatePickers = function () {
+		
+		var start = moment().subtract(1, 'years');
+        var end = moment();	
+
+        $('#kt_daterangepicker_1').daterangepicker({
+			startDate: start,
+			endDate: end,
+			buttonClasses: ' btn',
+            applyClass: 'btn-primary',
+			cancelClass: 'btn-secondary',
+			showWeekNumbers: true,
+			autoApply: false,
+			locale: {
+				format: 'YYYY-MM-DD'
+			}
+        });        
+    }    
+
+    return {
+        // public functions
+        init: function() {
+            setupDatePickers();            
+        }
+    };
+}();
+
+function quickEdit(user_name,action){
+	$.ajax({
+		url: BASE_URL + "/Users/" + action + "/" + user_name,
+		dataType: "json",
+		cache: false,
+		contentType: false,
+		processData: false
+	})
+	.done(function(res){
+		console.log(res);
+		if(res.error>0){
+			swal.fire({
+				html: res.message,
+				icon: "error",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			}).then(function() {
+				$('#kt_datatable').KTDatatable().reload();
+			});
+			return;
+		} else {
+			swal.fire({
+				html: res.message,
+				icon: "success",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			}).then(function() {
+				console.log("Refrescar la tabla");
+				$('#kt_datatable').KTDatatable().reload();
+			});
+			return;
+		}
+	});
+}
+
+
 jQuery(document).ready(function() {
 	KTAppsUsersListDatatable.init();
+	KTBootstrapDaterangepicker.init();
 });

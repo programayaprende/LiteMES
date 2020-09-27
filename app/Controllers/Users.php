@@ -12,8 +12,8 @@ class Users extends SecureController{
         $data = [];
         $data['page_title']= "Query Users";
 
-        $data['js_files'][] = '<script>var KTAppSettings = { "breakpoints": { "sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400 }, "colors": { "theme": { "base": { "white": "#ffffff", "primary": "#3699FF", "secondary": "#E5EAEE", "success": "#1BC5BD", "info": "#8950FC", "warning": "#FFA800", "danger": "#F64E60", "light": "#E4E6EF", "dark": "#181C32" }, "light": { "white": "#ffffff", "primary": "#E1F0FF", "secondary": "#EBEDF3", "success": "#C9F7F5", "info": "#EEE5FF", "warning": "#FFF4DE", "danger": "#FFE2E5", "light": "#F3F6F9", "dark": "#D6D6E0" }, "inverse": { "white": "#ffffff", "primary": "#ffffff", "secondary": "#3F4254", "success": "#ffffff", "info": "#ffffff", "warning": "#ffffff", "danger": "#ffffff", "light": "#464E5F", "dark": "#ffffff" } }, "gray": { "gray-100": "#F3F6F9", "gray-200": "#EBEDF3", "gray-300": "#E4E6EF", "gray-400": "#D1D3E0", "gray-500": "#B5B5C3", "gray-600": "#7E8299", "gray-700": "#5E6278", "gray-800": "#3F4254", "gray-900": "#181C32" } }, "font-family": "Poppins" };</script>';
-        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/user/list-datatable.js"></script>';
+        $data['js_files'][] = '<script>var KTAppSettings = { "breakpoints": { "sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400 }, "colors": { "theme": { "base": { "white": "#ffffff", "primary": "#3699FF", "secondary": "#E5EAEE", "success": "#1BC5BD", "info": "#8950FC", "warning": "#FFA800", "danger": "#F64E60", "light": "#E4E6EF", "dark": "#181C32" }, "light": { "white": "#ffffff", "primary": "#E1F0FF", "secondary": "#EBEDF3", "success": "#C9F7F5", "info": "#EEE5FF", "warning": "#FFF4DE", "danger": "#FFE2E5", "light": "#F3F6F9", "dark": "#D6D6E0" }, "inverse": { "white": "#ffffff", "primary": "#ffffff", "secondary": "#3F4254", "success": "#ffffff", "info": "#ffffff", "warning": "#ffffff", "danger": "#ffffff", "light": "#464E5F", "dark": "#ffffff" } }, "gray": { "gray-100": "#F3F6F9", "gray-200": "#EBEDF3", "gray-300": "#E4E6EF", "gray-400": "#D1D3E0", "gray-500": "#B5B5C3", "gray-600": "#7E8299", "gray-700": "#5E6278", "gray-800": "#3F4254", "gray-900": "#181C32" } }, "font-family": "Poppins" };</script>';        
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/user/user-list.js"></script>';
 
         echo view("templates/header",$data);
         echo view("users/user_list.php",$data);
@@ -21,9 +21,86 @@ class Users extends SecureController{
         
     }
 
+    public function Approve($user_name){
+
+        $json['error'] = 0;
+        $json['message'] = "";
+
+        $userModel = new UserModel();
+        $user = $userModel->find($user_name);
+
+        if(!$user){
+            $json['error'] = 1;
+            $json['message'] = "User name not found";
+        } else {
+            
+            $result = $userModel->update($user_name, ['approved'=>'1']);
+
+            if($result){
+                $json['message'] = "User account has been approved";
+            } else {
+                $json['message'] = "Error approving the user account, please try again later";
+            }
+        }
+
+        return $this->respond($json, 200);
+    }
+
+    public function Lock($user_name){
+
+        $json['error'] = 0;
+        $json['message'] = "";
+
+        $userModel = new UserModel();
+        $user = $userModel->find($user_name);
+
+        if(!$user){
+            $json['error'] = 1;
+            $json['message'] = "User name not found";
+        } else {
+            
+            $result = $userModel->update($user_name, ['locked'=>'1']);
+
+            if($result){
+                $json['message'] = "User account has been lock";
+            } else {
+                $json['message'] = "Error locking the user account, please try again later";
+            }
+        }
+
+        return $this->respond($json, 200);
+    }
+
+    public function Unlock($user_name){
+
+        $json['error'] = 0;
+        $json['message'] = "";
+
+        $userModel = new UserModel();
+        $user = $userModel->find($user_name);
+
+        if(!$user){
+            $json['error'] = 1;
+            $json['message'] = "User name not found";
+        } else {
+            
+            $result = $userModel->update($user_name, ['locked'=>'0']);
+
+            if($result){
+                $json['message'] = "User account has been unlock";
+            } else {
+                $json['message'] = "Error unlocking the user account, please try again later";
+            }
+        }
+
+        return $this->respond($json, 200);
+    }
+
     public function GetUsers(){
         
         $userModel = new UserModel();
+        $extra = [];
+        //$extra['segment'] =  $this->request->uri->getSegment(2);
         
         $data = $alldata = $userModel->findAll();
 
@@ -32,16 +109,47 @@ class Users extends SecureController{
 
         //Inicializar el constructor del query
         $dataBuilder = $userModel->builder();
-        $dataBuilder->select('user_name,email,first_name,last_name,locked,approved,last_login,created_at,job_description,contact_phone');
+        $dataBuilder->select('user_name,email,first_name,last_name,locked,approved,last_login,date(created_at) as created_at,job_description,contact_phone');
 
         // Se mando un filtro desde la cabecera del modulo
         $filter = isset($datatable['query']['generalSearch']) && is_string($datatable['query']['generalSearch']) ? $datatable['query']['generalSearch'] : '';
         if (!empty($filter)) {
-            $dataBuilder->like('user_name',$filter);
-            $dataBuilder->like('first_name',$filter);
-            $dataBuilder->like('last_name',$filter);            
+            $dataBuilder->orLike('user_name',$filter);
+            $dataBuilder->orLike('first_name',$filter);
+            $dataBuilder->orLike('last_name',$filter);            
             unset($datatable['query']['generalSearch']);
+        } else {
+            foreach($_REQUEST as $field=>$value){
+                
+                if(substr($field,0,7)!="filter_" or $value==""){
+                    continue;
+                }
+                switch($field){
+                    case "filter_registrationRange":                        
+                        if(strlen($value)==23){                            
+                            $startDate = substr($value,0,10);
+                            $endDate = substr($value,13,10);
+                            $dataBuilder->where('date(created_at) >=',$startDate);
+                            $dataBuilder->where('date(created_at) <=',$endDate);
+                        }                         
+                        break;
+                    case "filter_name":
+                        $condition = "(first_name like '%".$value."%' or last_name like '%".$value."%')";
+                        $dataBuilder->where($condition);
+                        break;
+                    case "filter_approved":
+                        $dataBuilder->where('approved',$value);
+                        break;
+                    case "filter_locked":
+                        $dataBuilder->where('locked',$value);
+                        break;
+                }
+            }
         }
+
+        //Revisar si se aplicaron filtros
+
+
 
         // Si se mandan filstros por columnas
         $query = isset($datatable['query']) && is_array($datatable['query']) ? $datatable['query'] : null;
@@ -88,18 +196,11 @@ class Users extends SecureController{
             'pages' => $pages,
             'perpage' => $perpage,
             'total' => $total,
-        );
-
-        //$_REQUEST['query']['generalSearch'] es para la busqueda rapida de la cabecera de la pagina
-        //$_REQUEST['pagination']['page'] page requerida
-        //$_REQUEST['pagination']['pages'] total de pagina
-        //$_REQUEST['pagination']['perpage'] rows por pagina
-        //$_REQUEST['pagination']['total'] rows totales
-        //$_REQUEST['sort']['field'] campo para sortear
-        //$_REQUEST['sort']['sort'] orden del sorteo
+        );     
 
         $result = array(            
-            'select' => $selectQuery,            
+            'select' => $selectQuery, 
+            'extra' => $extra,           
             'REQUEST' => $_REQUEST,            
             'meta' => $meta + array(
                 'sort' => $sort,
