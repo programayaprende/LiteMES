@@ -80,6 +80,7 @@ class Login extends BaseController
             'isLoggedIn' => true,
             'ip_address' => $_SERVER['REMOTE_ADDR'],
             'loc' => session()->get('loc'),
+            'user_name' => $user['user_name'],
         ];
 
         session()->set($data);

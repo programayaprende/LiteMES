@@ -2,7 +2,6 @@
 
 use CodeIgniter\API\ResponseTrait;
 use App\Models\UserModel;
-use App\Models\TestModel;
 
 class Users extends SecureController{
 
@@ -100,7 +99,9 @@ class Users extends SecureController{
         
         $userModel = new UserModel();
         $extra = [];
-        $extra['permission'] =  $this->permissions->hasPermission('andrew','Users','GetUsers');
+        $extra['header'] =  $this->request->getHeaderLine('X-Requested-With');
+        //$extra['header'] =  $this->request->getHeaders();
+        //$extra['segment'] = $this->request->uri->getSegments();
         
         $data = $alldata = $userModel->findAll();
 

@@ -7,8 +7,11 @@ namespace App\Controllers;
  * @package CodeIgniter
  */
 
+use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Controller;
 use App\Libraries\Permissions;
+
+
 
 class SecureController extends Controller
 {
@@ -22,6 +25,8 @@ class SecureController extends Controller
 	protected $helpers = [];
 
 	protected $permissions; 
+
+	use ResponseTrait;
 
 	/**
 	 * Constructor.
@@ -43,5 +48,28 @@ class SecureController extends Controller
 		}
 		
 		$this->permissions = new Permissions();
+
+		$segments = $this->request->uri->getSegments();
+
+		if(count($segments)>=2){
+			$controller = $segments[0];
+			$action = $segments[1]; 
+
+			if(!$this->permissions->hasPermission(session()->get('user_name'),$controller,$action)){				
+
+				if(strpos($this->request->getHeaderLine('Accept'),"json")>0) {
+					//Es una peticion de json
+					$json['error'] = 1;
+					$json['message'] = "No authorization";
+					return $this->respond($json, 500);
+					die();
+				} else {
+					header("Location: ".base_url("/TemplateBlank"));
+					die();
+				}
+			}
+
+		}
+
 	}
 }
