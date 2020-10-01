@@ -137,6 +137,18 @@ class Roles extends SecureController{
                     $json['lists_errors'] = '<ul><li>'.'Please provide a valid ID'.'</li></ul>';
                 } else {                    
                     $json['role_data'] = $roleData;
+
+                    $db = db_connect();
+
+                    //Traer todos los permisos que tiene actualmente el role
+                    $sql = "
+                    select id_permission,type from lnk_roles_permissions where id_role = ?
+                    ";
+                    $query = $db->query($sql,[$id]);
+                    foreach($query->getResultArray() as $row){
+                        $json['permissions'][] = $row;
+                    }
+
                 }
             }
 
@@ -177,8 +189,8 @@ class Roles extends SecureController{
                     
                     $rules = [
                         'id' => 'required',
-                        'name' => 'required|min_length[3]|max_length[20]||is_unique[ma_roles.name,id,{id}]',
-                        'description' =>  'required|min_length[3]|max_length[20]',                        
+                        'name' => 'required|min_length[3]|max_length[20]|is_unique[ma_roles.name,id,{id}]',
+                        'description' =>  'required|min_length[3]|max_length[20]',
                     ];
                     
                     if(!$this->validate($rules)){                
@@ -202,6 +214,74 @@ class Roles extends SecureController{
                         $json['message'] = "Role update succesfully";
                         
                     }
+
+                    
+                    $id_role = $this->request->getVar('id');
+
+                    //Extraer todos los ID de permisos que existen                    
+                    $db = db_connect();
+
+                    $sql  = "
+                    SELECT
+                    id 
+                    FROM
+                    ma_permissions a
+                    order by a.controller 
+                    ";
+                    $json['sql'][] = $sql;
+                    $query = $db->query($sql);
+
+                    foreach ($query->getResultArray() as $row)
+                    {
+                        $permissions[] = $row['id'];
+                    }
+
+                    foreach($permissions as $id_permission){
+                        //Revisar si se envio el informacion sobre el permiso
+                        if($new_action = $this->request->getVar('permission_'.$id_permission)){
+                            //Revisar si ya existe el record en base de datos
+                            $sql = "
+                            select * from lnk_roles_permissions where id_permission = ? and id_role = ?
+                            ";
+                            $json['sql'][] = $sql;
+                            $query = $db->query($sql,[$id_permission,$id_role]);
+
+                            if($row = $query->getRowArray()){                                
+                                //Si la nueva action es DEFAULT borrar el record de la tabla
+                                if($new_action=="DEFAULT"){
+                                    $sql = "
+                                    delete from lnk_roles_permissions where id_permission = ? and id_role = ?
+                                    ";
+                                    $json['sql'][] = $sql;
+                                    $query = $db->query($sql,[$id_permission,$id_role]);
+                                } else {
+                                    //Si el valor es distinto al nuevo hacer un update
+                                    if($row['type']!=$new_action){
+                                        $sql = "
+                                        update lnk_roles_permissions set type = ? where id_permission = ? and id_role = ?
+                                        ";
+                                        $json['sql'][] = $sql;
+                                        $query = $db->query($sql,[$new_action,$id_permission,$id_role]);
+                                    }
+                                }                                
+                            } else if($new_action!="DEFAULT"){
+                                //Si no existe el record y la nueva accion es diferente de DEFAULT
+                                //crear un nuevo registro
+                                $sql = "
+                                insert into lnk_roles_permissions
+                                (id_role,id_permission,type,created_at)
+                                values 
+                                (?      ,?            ,?   ,now())
+                                ";
+                                $json['sql'][] = $sql;
+                                $query = $db->query($sql,[$id_role,$id_permission,$new_action]);
+                            }
+                            
+                        }
+                    }
+                    
+
+                    
                 }
             }
 
@@ -292,6 +372,9 @@ class Roles extends SecureController{
                     $json['id'] = $roleInserted;
                     $json['message'] = "New role added succesfully";
                 }
+
+                //Grabar los permisos
+
                 
             }
 
@@ -303,6 +386,28 @@ class Roles extends SecureController{
         $data['style_files'][] = '<link href="'.base_url().'/assets/css/pages/wizard/wizard-4.css" rel="stylesheet" type="text/css" />';
         $data['js_files'][] = '<script> var DEFAULT_ACTION = "new"; </script>';
         $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/role/role-form.js"></script>';
+
+        $db = db_connect();
+        
+        $sql  = "
+        SELECT
+        a.*, null as type 
+        FROM
+        ma_permissions a        
+        order by a.controller 
+        ";
+        
+        $query = $db->query($sql);
+
+        foreach ($query->getResultArray() as $row)
+        {
+            $permission[$row['controller']][] = $row;            
+        }
+
+        $controllers = array_keys($permission);
+
+        $data['permissions'] = $permission;
+        $data['controllers'] = $controllers;
 
 
         echo view("templates/header",$data);

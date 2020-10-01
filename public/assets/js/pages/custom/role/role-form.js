@@ -128,8 +128,9 @@ var KTRoleEdit = function () {
             type: "post",
             dataType: "json"            
         })
-        .done(function(res){
-            console.log(res);                
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
             if(res.error>0){
                 swal.fire({
                     html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
@@ -143,11 +144,14 @@ var KTRoleEdit = function () {
                     KTUtil.scrollTop();
                 });              
                 return;
-            } else { 
+            } else {                 
                 $("#main_subtitle").html(res.role_data.name);
                 $("#name").val(res.role_data.name);
                 $("#description").val(res.role_data.description);
                 $("#id").val(res.role_data.id);
+                $.each( res.permissions, function( key, val ) {
+                    $("#permission_" + val.id_permission).val(val.type);
+				});
                 return;
             }
         });

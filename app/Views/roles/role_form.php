@@ -121,7 +121,7 @@
 									<!--end::Card header-->
 									<!--begin::Card body-->
 									<div class="card-body">
-										<form class="form" id="kt_form" method="post" enctype="multipart/form-data">
+										<form class="form" id="kt_form" method="post">
 											<input type="hidden" name="action" id="action" value="">
 											<input type="hidden" name="after_action" id="after_action" value="save_and_continue">
 											<div class="tab-content">
@@ -187,7 +187,48 @@
 																			</div>
 																			<div id="<?=$controller?>" class="collapse" data-parent="#accordionExample4">
 																				<div class="card-body">
-																					...
+																					<!--begin::Table-->
+																					<div class="table-responsive">
+																						<table class="table table-head-custom table-head-bg table-borderless table-vertical-center">
+																							<thead>
+																								<tr class="text-left text-uppercase">
+																									<th style="min-width: 100px" class="pl-7">
+																										<span class="text-dark-75">Permission</span>
+																									</th>
+																									<th style="min-width: 250px">Description</th>
+																									<th style="min-width: 100px">Default Action</th>
+																									<th style="min-width: 100px">Role Action</th>																									
+																								</tr>
+																							</thead>
+																							<tbody>
+																								<?php
+																								foreach($permissions[$controller] as $permission){
+																								?>
+																								<tr>
+																									<td>
+																										<span class="text-dark-75 font-weight-bolder d-block font-size-lg"><?=$permission['action']?></span>
+																									</td>
+																									<td>
+																										<span class="font-size-lg"><?=$permission['description']?></span>
+																									</td>
+																									<td>
+																										<span class="text-dark-75 font-weight-bolder d-block font-size-lg"><?=$permission['default']?></span>
+																									</td>
+																									<td>																										
+																										<select class="form-control" name="permission_<?=$permission['id']?>" id="permission_<?=$permission['id']?>">
+																											<option value="DEFAULT" selected>DEFAULT</option>
+																											<option value="DENY">DENY</option>
+																											<option value="ALLOW">ALLOW</option>
+																										</select>
+																									</td>																									
+																								</tr>
+																								<?php
+																								}
+																								?>
+																							</tbody>
+																						</table>
+																					</div>
+																					<!--end::Table-->
 																				</div>
 																			</div>
 																		</div>
