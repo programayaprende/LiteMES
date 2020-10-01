@@ -8,6 +8,11 @@ class Users extends SecureController{
     use ResponseTrait;
 
     public function index(){
+        header("Location: ".base_url("/Users/List"));
+		die();
+    }
+
+    public function List(){
         $data = [];
         $data['page_title']= "Query Users";
 
@@ -17,7 +22,6 @@ class Users extends SecureController{
         echo view("templates/header",$data);
         echo view("users/user_list.php",$data);
         echo view("templates/footer",$data);
-        
     }
 
     public function Approve($user_name){
@@ -99,7 +103,7 @@ class Users extends SecureController{
         
         $userModel = new UserModel();
         $extra = [];
-        $extra['header'] =  $this->request->getHeaderLine('X-Requested-With');
+        //$extra['header'] =  $this->request->getHeaderLine('X-Requested-With');
         //$extra['header'] =  $this->request->getHeaders();
         //$extra['segment'] = $this->request->uri->getSegments();
         

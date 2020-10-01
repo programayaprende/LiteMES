@@ -54,21 +54,26 @@ class SecureController extends Controller
 		if(count($segments)>=2){
 			$controller = $segments[0];
 			$action = $segments[1]; 
+		}
 
-			if(!$this->permissions->hasPermission(session()->get('user_name'),$controller,$action)){				
+		if(count($segments)==1){
+			$controller = $segments[0];
+			$action = "List";
+		}
 
-				if(strpos($this->request->getHeaderLine('Accept'),"json")>0) {
-					//Es una peticion de json
-					$json['error'] = 1;
-					$json['message'] = "No authorization";
-					return $this->respond($json, 500);
-					die();
-				} else {
-					header("Location: ".base_url("/TemplateBlank"));
-					die();
-				}
+		if(!$this->permissions->hasPermission(session()->get('user_name'),$controller,$action)){				
+
+			if(strpos($this->request->getHeaderLine('Accept'),"json")>0) {
+				//Es una peticion de json
+				$json['error'] = 1;
+				$json['message'] = "Forbidden";
+				http_response_code(403);
+				echo json_encode($json);
+				die();
+			} else {
+				header("Location: ".base_url("/Forbidden"));
+				die();
 			}
-
 		}
 
 	}
