@@ -173,54 +173,28 @@
 													<!--begin::Body-->
 													<div class="card-body">
 														<!--begin::Row-->
-														<div class="row">
-															<div class="col-xl-2"></div>
-															<div class="col-xl-7">
-																<!--begin::Row-->
-																<div class="row mb-5 d-none">
-																	<label class="col-3"></label>
-																	<div class="col-9">
-																		<div class="alert alert-custom alert-light-danger fade show py-4" role="alert">
-																			<div class="alert-icon">
-																				<i class="flaticon-warning"></i>
+														<div class="row">															
+															<div class="col-xl-12">																
+																<div class="accordion  accordion-toggle-arrow" id="accordionExample4">
+																	<?php																	
+																	foreach($controllers as $controller){
+																	?>
+																		<div class="card">
+																			<div class="card-header">
+																				<div class="card-title collapsed" data-toggle="collapse" data-target="#<?=$controller?>">
+																					<i class="flaticon2-layers-1"></i> <?=$controller?> Permissions
+																				</div>
 																			</div>
-																			<div class="alert-text font-weight-bold">Configure role passwords to expire periodically.
-																			<br />Roles will need warning that their passwords are going to expire, or they might inadvertently get locked out of the system!</div>
-																			<div class="alert-close">
-																				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-																					<span aria-hidden="true">
-																						<i class="la la-close"></i>
-																					</span>
-																				</button>
+																			<div id="<?=$controller?>" class="collapse" data-parent="#accordionExample4">
+																				<div class="card-body">
+																					...
+																				</div>
 																			</div>
 																		</div>
-																	</div>
+																		<?php																	
+																	}
+																	?>									
 																</div>
-																<!--end::Row-->
-																<!--begin::Row-->
-																<div class="row">
-																	<label class="col-3"></label>
-																	<div class="col-9">
-																		<h6 class="text-dark font-weight-bold mb-10">Change Password:</h6>
-																	</div>
-																</div>
-																<!--end::Row-->																
-																<!--begin::Group-->
-																<div class="form-group row">
-																	<label class="col-form-label col-3 text-lg-right text-left">New Password</label>
-																	<div class="col-9">
-																		<input class="form-control form-control-lg form-control-solid" type="password" name="password_new" id="password_new" value="" />
-																	</div>
-																</div>
-																<!--end::Group-->
-																<!--begin::Group-->
-																<div class="form-group row ">
-																	<label class="col-form-label col-3 text-lg-right text-left">Verify Password</label>
-																	<div class="col-9">
-																		<input class="form-control form-control-lg form-control-solid" type="password" name="password_new_verify" id="password_new_verify" value="" />
-																	</div>
-																</div>
-																<!--end::Group-->
 															</div>
 														</div>
 														<!--end::Row-->

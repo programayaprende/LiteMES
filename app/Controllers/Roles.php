@@ -18,7 +18,7 @@ class Roles extends SecureController{
 
         $data['js_files'][] = '<script>var KTAppSettings = { "breakpoints": { "sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400 }, "colors": { "theme": { "base": { "white": "#ffffff", "primary": "#3699FF", "secondary": "#E5EAEE", "success": "#1BC5BD", "info": "#8950FC", "warning": "#FFA800", "danger": "#F64E60", "light": "#E4E6EF", "dark": "#181C32" }, "light": { "white": "#ffffff", "primary": "#E1F0FF", "secondary": "#EBEDF3", "success": "#C9F7F5", "info": "#EEE5FF", "warning": "#FFF4DE", "danger": "#FFE2E5", "light": "#F3F6F9", "dark": "#D6D6E0" }, "inverse": { "white": "#ffffff", "primary": "#ffffff", "secondary": "#3F4254", "success": "#ffffff", "info": "#ffffff", "warning": "#ffffff", "danger": "#ffffff", "light": "#464E5F", "dark": "#ffffff" } }, "gray": { "gray-100": "#F3F6F9", "gray-200": "#EBEDF3", "gray-300": "#E4E6EF", "gray-400": "#D1D3E0", "gray-500": "#B5B5C3", "gray-600": "#7E8299", "gray-700": "#5E6278", "gray-800": "#3F4254", "gray-900": "#181C32" } }, "font-family": "Poppins" };</script>';        
         $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/role/role-list.js"></script>';
-
+       
         echo view("templates/header",$data);
         echo view("roles/role_list.php",$data);
         echo view("templates/footer",$data);
@@ -214,6 +214,30 @@ class Roles extends SecureController{
         $data['js_files'][] = '<script> var REQUEST_ID = "'.$id.'"; </script>';
         $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/role/role-form.js"></script>';
 
+        $db = db_connect();
+        
+        $sql  = "
+        SELECT
+        * 
+        FROM
+        ma_permissions a
+        left join (select * from  lnk_roles_permissions where id_role=?) b
+        on a.id = b.id_permission
+        order by a.controller 
+        ";
+        
+        $query = $db->query($sql, [$id]);
+
+        foreach ($query->getResultArray() as $row)
+        {
+            $permission[$row['controller']][] = $row;            
+        }
+
+        $controllers = array_keys($permission);
+
+        $data['permissions'] = $permission;
+        $data['controllers'] = $controllers;
+
 
         echo view("templates/header",$data);
         echo view("roles/role_form",$data);
@@ -237,17 +261,10 @@ class Roles extends SecureController{
             
             $rules = [
                 'name' => 'required|min_length[3]|max_length[20]|is_unique[ma_roles.name]',
-                'description' =>  'required|min_length[3]|max_length[20]',
-                'id' => 'required|is_unique[ma_users.id]',
+                'description' =>  'required|min_length[3]|max_length[20]',                
             ];
 
-            $errors = [
-                'id' => [
-                    'is_unique' => 'ID already exists'
-                ]
-            ];
-
-            if(!$this->validate($rules,$errors)){                
+            if(!$this->validate($rules)){                
                 $json['error'] = 1;
                 $json['message'] = "Validation Errors";
                 $json['errors'] = $this->validator->getErrors();
@@ -257,7 +274,6 @@ class Roles extends SecureController{
                 $role = new RoleModel();
 
                 $roleData = [
-                    "id" => $this->request->getVar('id'),
                     "name" => $this->request->getVar('name'),
                     "description" => $this->request->getVar('description'),
                 ];
@@ -265,7 +281,7 @@ class Roles extends SecureController{
                 $role->insert($roleData);
                 
                 //Verify the insert
-                $roleInserted = $role->find($roleData['id']);
+                $roleInserted = $role->insertID();
 
                 if(!$roleInserted){
                     $json['error'] = 1;
@@ -273,7 +289,7 @@ class Roles extends SecureController{
                     $json['errors'] = array('id'=> 'Error Creating a new role');
                     $json['lists_errors'] = "<ul><li>Error creating a new role</li></ul>";
                 } else {
-                    $json['id'] = $roleInserted['id'];
+                    $json['id'] = $roleInserted;
                     $json['message'] = "New role added succesfully";
                 }
                 
