@@ -299,7 +299,7 @@
 															</a>
 														</li>														
 														<li class="menu-item" aria-haspopup="true">
-															<a href="custom/apps/user/add-user.html" class="menu-link">
+															<a href="<?=base_url("Roles/New")?>" class="menu-link">
 																<i class="menu-bullet menu-bullet-dot">
 																	<span></span>
 																</i>

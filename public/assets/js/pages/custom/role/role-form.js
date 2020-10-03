@@ -126,7 +126,7 @@ var KTRoleEdit = function () {
         $.ajax({
             url: BASE_URL + "/Roles/GetRoleData/" + id,
             type: "post",
-            dataType: "json"            
+            dataType: "json"
         })
         .done(function(res){            
             console.log("res");
@@ -149,9 +149,16 @@ var KTRoleEdit = function () {
                 $("#name").val(res.role_data.name);
                 $("#description").val(res.role_data.description);
                 $("#id").val(res.role_data.id);
+                
+                dataUsers = res.users;
+                reload_users_table();
+
                 $.each( res.permissions, function( key, val ) {
                     $("#permission_" + val.id_permission).val(val.type);
-				});
+                });
+
+
+                
                 return;
             }
         });
@@ -202,6 +209,99 @@ var KTRoleEdit = function () {
 	};
 }();
 
+var dataTable;
+var dataUsers = null;
+
+var KTDatatablesDataSourceAjaxClient = function() {
+
+	var initTable1 = function() {
+                
+        dataTable = $('#kt_datatable');
+
+		// begin first table
+		dataTable.DataTable({
+			responsive: true,
+			data: dataUsers,
+			columnDefs: [
+				{
+					targets: -1,
+					title: 'Actions',
+					orderable: false,
+					render: function(data, type, full, meta) {                        
+                        return '\
+							<div class="d-flex align-items-center">\
+								<a href="javascript:removeUser(\'' + full[0] + '\');" class="btn btn-sm btn-clean btn-icon" title="Delete">\
+									<i class="la la-trash"></i>\
+								</a>\
+							</div>\
+						';
+					},
+				},
+			],
+		});
+	};
+
+	return {
+
+		//main function to initiate the module
+		init: function() {
+			initTable1();
+		},
+
+	};
+
+}();
+
+function reload_users_table(){
+    
+    var table = $('#kt_datatable').DataTable();
+    table.destroy();    
+    KTDatatablesDataSourceAjaxClient.init();
+    
+}
+
+function removeUser(user_name){
+	$.ajax({
+		url: BASE_URL + "/Roles/RemoveUser/" + $("#id").val() + "/" + user_name,
+		dataType: "json",
+		cache: false,
+		contentType: false,
+		processData: false
+	})
+	.done(function(res){
+		console.log(res);
+		if(res.error>0){
+			swal.fire({
+				html: res.message,
+				icon: "error",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			}).then(function() {
+				KTRoleEdit.initRole(res.id_role);
+			});
+			return;
+		} else {
+			swal.fire({
+				html: res.message,
+				icon: "success",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			}).then(function() {
+				console.log("Refrescar la tabla");
+				KTRoleEdit.initRole(res.id_role);
+			});
+			return;
+		}
+	});
+}
+
 jQuery(document).ready(function() {
-	KTRoleEdit.init();
+    KTRoleEdit.init();    
+    KTDatatablesDataSourceAjaxClient.init();
 });

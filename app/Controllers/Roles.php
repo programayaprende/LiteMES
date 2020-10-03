@@ -24,6 +24,133 @@ class Roles extends SecureController{
         echo view("templates/footer",$data);
     }
 
+    public function RemoveUser($id_role,$user_name){
+
+        $json['error'] = 0;
+        $json['message'] = "";
+        $json['id_role'] = $id_role;
+        $json['user_name'] = $user_name;
+
+        $db = db_connect();
+
+        $sql = "
+        select count(*) as CNT from lnk_users_roles where id_role = ? and user_name = ?
+        ";
+
+        $query = $db->query($sql,[$id_role,$user_name]);
+
+        $result = $query->getRowArray();
+
+        if($result['CNT']==0){
+            $json['error'] = 1;
+            $json['message'] = "User not found assigned to this role";
+        } else {
+            $sql = "
+            delete from lnk_users_roles where id_role = ? and user_name = ?
+            ";
+            $query = $db->query($sql,[$id_role,$user_name]);
+            $json['message'] = "User successfully remove from this role";
+        }
+        
+        return $this->respond($json, 200);
+    }
+
+    public function GetUsers($id_role){ //NO ESTA EN USO
+        
+        $db = db_connect();
+        
+        $extra = [];
+        
+        //Datos enviados por DataTable
+        $datatable = array_merge(array('pagination' => array(), 'sort' => array(), 'query' => array()), $_REQUEST);
+
+        //Inicializar el constructor del query        
+        $sql = "
+        select user_name,email,first_name,last_name,locked,approved,last_login,date(created_at) as created_at,job_description,contact_phone from ma_users 
+        where user_name in (select user_name from lnk_users_roles where id_role=".$db->escape($id_role).")
+        ";
+
+        // Se mando un filtro desde la cabecera del modulo
+        $filter = isset($datatable['query']['generalSearch']) && is_string($datatable['query']['generalSearch']) ? $datatable['query']['generalSearch'] : '';
+        if (!empty($filter)) {
+            $sql .= "
+            and (name like '%".$db->escapeLikeString($filter)."%' or description like '%".$db->escapeLikeString($filter)."%')
+            ";
+            unset($datatable['query']['generalSearch']);
+        } else {
+            foreach($_REQUEST as $field=>$value){
+                
+                if(substr($field,0,7)!="filter_" or $value==""){
+                    continue;
+                }
+                switch($field){
+                    case "filter_name":
+                        $sql .= "(first_name like '%".$db->escapeLikeString($value)."%' or last_name like '%".$db->escapeLikeString($value)."%')";                        
+                        break;                    
+                }
+            }
+        }
+        
+        //Checar si se mando info para el sort
+        $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'asc';
+        $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'first_name';
+
+        //Aplicar el sort en el query
+        $sql.= "
+        order by $field $sort
+        ";
+
+        //Revisar que pagina quieren ver        
+        $page = !empty($datatable['pagination']['page']) ? (int)$datatable['pagination']['page'] : 1;
+        //Revisar cuantos items por pagina
+        $perpage = !empty($datatable['pagination']['perpage']) ? (int)$datatable['pagination']['perpage'] : -1;
+
+        $pages = 1;
+        $total = 100;
+
+        if ($perpage > 0) {
+            $pages = ceil($total / $perpage); // calculate total pages
+            $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
+            $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
+            $offset = ($page - 1) * $perpage;
+            if ($offset < 0) {
+                $offset = 0;
+            }                                    
+            $sql .= "
+            limit $offset , $perpage
+            ";
+        }
+                
+        $extra['sql'] = $sql;
+
+        $data = [];
+
+        $query = $db->query($sql);
+        foreach ($query->getResultArray() as $row)
+        {
+            $data[] = $row;
+        }
+
+        $meta = array(
+            'page' => $page,
+            'pages' => $pages,
+            'perpage' => $perpage,
+            'total' => $total,
+        );     
+
+        $result = array(
+            'extra' => $extra,
+            'meta' => $meta + array(
+                'sort' => $sort,
+                'field' => $field,
+            ),
+            'data' => $data
+        );
+        
+        echo json_encode($result, JSON_PRETTY_PRINT);
+
+    }
+
     public function GetRoles(){
         
         $roleModel = new RoleModel();
@@ -148,6 +275,36 @@ class Roles extends SecureController{
                     foreach($query->getResultArray() as $row){
                         $json['permissions'][] = $row;
                     }
+        
+                    $extra = [];
+                                        
+                    //Traer los usuarios que usan este rol
+                    $sql = "
+                    select user_name,email,first_name,last_name,locked,approved,last_login,date(created_at) as created_at,job_description,contact_phone from ma_users 
+                    where user_name in (select user_name from lnk_users_roles where id_role=".$db->escape($id).")
+                    ";
+
+                    $sql.= "
+                    order by first_name 
+                    ";
+
+                    $data = [];
+                    $users = [];
+
+                    $query = $db->query($sql);
+                    foreach ($query->getResultArray() as $row)
+                    {
+                        $users[] = array(
+                            $row['user_name'],
+                            $row['first_name'],
+                            $row['last_name'],
+                            $row['email'],
+                            $row['job_description'],
+                            "-",
+                        );
+                    }
+
+                    $json['users'] = $users;
 
                 }
             }
@@ -290,8 +447,11 @@ class Roles extends SecureController{
 
         $data['page_title']= "Roles | Edit ( ".$id." )";
         $data['style_files'][] = '<link href="'.base_url().'/assets/css/pages/wizard/wizard-4.css" rel="stylesheet" type="text/css" />';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
+        
         $data['js_files'][] = '<script> var DEFAULT_ACTION = "edit"; </script>';
-        $data['js_files'][] = '<script> var REQUEST_ID = "'.$id.'"; </script>';
+        $data['js_files'][] = '<script> var REQUEST_ID = "'.$id.'"; </script>';        
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
         $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/role/role-form.js"></script>';
 
         $db = db_connect();

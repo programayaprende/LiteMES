@@ -113,6 +113,48 @@
 														<span class="nav-text font-size-lg">Permissions</span>
 													</a>
 												</li>
+												<!--end::Item-->
+												<!--begin::Item-->
+												<li class="nav-item mr-3 edit-role d-none">
+													<a class="nav-link" data-toggle="tab" href="#kt_role_edit_tab_4">
+														<span class="nav-icon">
+															<span class="svg-icon">
+																<!--begin::Svg Icon | path:assets/media/svg/icons/Communication/Shield-role.svg-->
+																<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+																	<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+																		<rect x="0" y="0" width="24" height="24" />
+																		<path d="M4,4 L11.6314229,2.5691082 C11.8750185,2.52343403 12.1249815,2.52343403 12.3685771,2.5691082 L20,4 L20,13.2830094 C20,16.2173861 18.4883464,18.9447835 16,20.5 L12.5299989,22.6687507 C12.2057287,22.8714196 11.7942713,22.8714196 11.4700011,22.6687507 L8,20.5 C5.51165358,18.9447835 4,16.2173861 4,13.2830094 L4,4 Z" fill="#000000" opacity="0.3" />
+																		<path d="M12,11 C10.8954305,11 10,10.1045695 10,9 C10,7.8954305 10.8954305,7 12,7 C13.1045695,7 14,7.8954305 14,9 C14,10.1045695 13.1045695,11 12,11 Z" fill="#000000" opacity="0.3" />
+																		<path d="M7.00036205,16.4995035 C7.21569918,13.5165724 9.36772908,12 11.9907452,12 C14.6506758,12 16.8360465,13.4332455 16.9988413,16.5 C17.0053266,16.6221713 16.9988413,17 16.5815,17 C14.5228466,17 11.463736,17 7.4041679,17 C7.26484009,17 6.98863236,16.6619875 7.00036205,16.4995035 Z" fill="#000000" opacity="0.3" />
+																	</g>
+																</svg>
+																<!--end::Svg Icon-->
+															</span>
+														</span>
+														<span class="nav-text font-size-lg">Role Users</span>
+													</a>
+												</li>
+												<!--end::Item-->
+												<!--begin::Item-->
+												<li class="nav-item mr-3 edit-role d-none">
+													<a class="nav-link" href="javascript://">
+														<span class="nav-icon">
+															<span class="svg-icon">
+																<!--begin::Svg Icon | path:assets/media/svg/icons/Communication/Shield-role.svg-->
+																<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+																	<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+																		<rect x="0" y="0" width="24" height="24" />
+																		<path d="M4,4 L11.6314229,2.5691082 C11.8750185,2.52343403 12.1249815,2.52343403 12.3685771,2.5691082 L20,4 L20,13.2830094 C20,16.2173861 18.4883464,18.9447835 16,20.5 L12.5299989,22.6687507 C12.2057287,22.8714196 11.7942713,22.8714196 11.4700011,22.6687507 L8,20.5 C5.51165358,18.9447835 4,16.2173861 4,13.2830094 L4,4 Z" fill="#000000" opacity="0.3" />
+																		<path d="M12,11 C10.8954305,11 10,10.1045695 10,9 C10,7.8954305 10.8954305,7 12,7 C13.1045695,7 14,7.8954305 14,9 C14,10.1045695 13.1045695,11 12,11 Z" fill="#000000" opacity="0.3" />
+																		<path d="M7.00036205,16.4995035 C7.21569918,13.5165724 9.36772908,12 11.9907452,12 C14.6506758,12 16.8360465,13.4332455 16.9988413,16.5 C17.0053266,16.6221713 16.9988413,17 16.5815,17 C14.5228466,17 11.463736,17 7.4041679,17 C7.26484009,17 6.98863236,16.6619875 7.00036205,16.4995035 Z" fill="#000000" opacity="0.3" />
+																	</g>
+																</svg>
+																<!--end::Svg Icon-->
+															</span>
+														</span>
+														<span class="nav-text font-size-lg">+ Add User</span>
+													</a>
+												</li>
 												<!--end::Item-->												
 											</ul>
 										</div>
@@ -170,77 +212,112 @@
 												<!--end::Tab-->
 												<!--begin::Tab-->
 												<div class="tab-pane px-7 edit-role d-none" id="kt_role_edit_tab_3" role="tabpanel">
-													<!--begin::Body-->
-													<div class="card-body">
-														<!--begin::Row-->
-														<div class="row">															
-															<div class="col-xl-12">																
-																<div class="accordion  accordion-toggle-arrow" id="accordionExample4">
-																	<?php																	
-																	foreach($controllers as $controller){
-																	?>
-																		<div class="card">
-																			<div class="card-header">
-																				<div class="card-title collapsed" data-toggle="collapse" data-target="#<?=$controller?>">
-																					<i class="flaticon2-layers-1"></i> <?=$controller?> Permissions
-																				</div>
-																			</div>
-																			<div id="<?=$controller?>" class="collapse" data-parent="#accordionExample4">
-																				<div class="card-body">
-																					<!--begin::Table-->
-																					<div class="table-responsive">
-																						<table class="table table-head-custom table-head-bg table-borderless table-vertical-center">
-																							<thead>
-																								<tr class="text-left text-uppercase">
-																									<th style="min-width: 100px" class="pl-7">
-																										<span class="text-dark-75">Permission</span>
-																									</th>
-																									<th style="min-width: 250px">Description</th>
-																									<th style="min-width: 100px">Default Action</th>
-																									<th style="min-width: 100px">Role Action</th>																									
-																								</tr>
-																							</thead>
-																							<tbody>
-																								<?php
-																								foreach($permissions[$controller] as $permission){
-																								?>
-																								<tr>
-																									<td>
-																										<span class="text-dark-75 font-weight-bolder d-block font-size-lg"><?=$permission['action']?></span>
-																									</td>
-																									<td>
-																										<span class="font-size-lg"><?=$permission['description']?></span>
-																									</td>
-																									<td>
-																										<span class="text-dark-75 font-weight-bolder d-block font-size-lg"><?=$permission['default']?></span>
-																									</td>
-																									<td>																										
-																										<select class="form-control" name="permission_<?=$permission['id']?>" id="permission_<?=$permission['id']?>">
-																											<option value="DEFAULT" selected>DEFAULT</option>
-																											<option value="DENY">DENY</option>
-																											<option value="ALLOW">ALLOW</option>
-																										</select>
-																									</td>																									
-																								</tr>
-																								<?php
-																								}
-																								?>
-																							</tbody>
-																						</table>
-																					</div>
-																					<!--end::Table-->
-																				</div>
+													<!--begin::Row-->
+													<div class="row">															
+														<div class="col-xl-12">																
+															<div class="accordion  accordion-toggle-arrow" id="accordionExample4">
+																<?php																	
+																foreach($controllers as $controller){
+																?>
+																	<div class="card">
+																		<div class="card-header">
+																			<div class="card-title collapsed" data-toggle="collapse" data-target="#<?=$controller?>">
+																				<i class="flaticon2-layers-1"></i> <?=$controller?> Permissions
 																			</div>
 																		</div>
-																		<?php																	
-																	}
-																	?>									
-																</div>
+																		<div id="<?=$controller?>" class="collapse" data-parent="#accordionExample4">
+																			<div class="card-body">
+																				<!--begin::Table-->
+																				<div class="table-responsive">
+																					<table class="table table-head-custom table-head-bg table-borderless table-vertical-center">
+																						<thead>
+																							<tr class="text-left text-uppercase">
+																								<th style="min-width: 100px" class="pl-7">
+																									<span class="text-dark-75">Permission</span>
+																								</th>
+																								<th style="min-width: 250px">Description</th>
+																								<th style="min-width: 100px">Default Action</th>
+																								<th style="min-width: 100px">Role Action</th>																									
+																							</tr>
+																						</thead>
+																						<tbody>
+																							<?php
+																							foreach($permissions[$controller] as $permission){
+																							?>
+																							<tr>
+																								<td>
+																									<span class="text-dark-75 font-weight-bolder d-block font-size-lg"><?=$permission['action']?></span>
+																								</td>
+																								<td>
+																									<span class="font-size-lg"><?=$permission['description']?></span>
+																								</td>
+																								<td>
+																									<span class="text-dark-75 font-weight-bolder d-block font-size-lg"><?=$permission['default']?></span>
+																								</td>
+																								<td>																										
+																									<select class="form-control" name="permission_<?=$permission['id']?>" id="permission_<?=$permission['id']?>">
+																										<option value="DEFAULT" selected>DEFAULT</option>
+																										<option value="DENY">DENY</option>
+																										<option value="ALLOW">ALLOW</option>
+																									</select>
+																								</td>																									
+																							</tr>
+																							<?php
+																							}
+																							?>
+																						</tbody>
+																					</table>
+																				</div>
+																				<!--end::Table-->
+																			</div>
+																		</div>
+																	</div>
+																	<?php																	
+																}
+																?>									
 															</div>
 														</div>
-														<!--end::Row-->
 													</div>
-													<!--end::Body-->													
+													<!--end::Row-->																										
+												</div>
+												<!--end::Tab-->
+												<!--begin::Tab-->
+												<div class="tab-pane px-7 edit-role d-none" id="kt_role_edit_tab_4" role="tabpanel">
+													<!--begin::Row-->
+													<div class="row">															
+														<div class="col-xl-12">																
+															<!--begin::Warning-->
+															<div class="alert alert-custom alert-light-warning fade show py-4" role="alert">
+																<div class="alert-icon">
+																	<i class="flaticon-warning"></i>
+																</div>
+																<div class="alert-text font-weight-bold">Removing a user from this list will immediately take effect, not need to press Save Changes button</div>
+																<div class="alert-close">
+																	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+																		<span aria-hidden="true">
+																			<i class="la la-close"></i>
+																		</span>
+																	</button>
+																</div>
+															</div>
+															<!--end::Warning-->
+															<!--begin: Datatable-->
+															<table class="table table-bordered table-hover table-checkable" id="kt_datatable" style="margin-top: 13px !important">
+																<thead>
+																	<tr>
+																		<th>User Name</th>
+																		<th>First Name</th>
+																		<th>Last Name</th>
+																		<th>Email</th>
+																		<th>Job</th>																		
+																		<th>Actions</th>
+																	</tr>
+																</thead>
+															</table>
+															<!--end: Datatable-->
+														</div>
+													</div>
+													<!--end::Row-->																										
 												</div>
 												<!--end::Tab-->												
 											</div>
