@@ -24,6 +24,38 @@ class Roles extends SecureController{
         echo view("templates/footer",$data);
     }
 
+    public function AddUser($id_role,$user_name){
+
+        $json['error'] = 0;
+        $json['message'] = "";
+        $json['id_role'] = $id_role;
+        $json['user_name'] = $user_name;
+
+        $db = db_connect();
+
+        $sql = "
+        select count(*) as CNT from lnk_users_roles where id_role = ? and user_name = ?
+        ";
+
+        $query = $db->query($sql,[$id_role,$user_name]);
+
+        $result = $query->getRowArray();
+
+        if($result['CNT']>0){
+            $json['error'] = 1;
+            $json['message'] = "User already assigned to this role";
+        } else {
+            $sql = "
+            insert into lnk_users_roles(id_role,user_name,created_at) values (?,?,now())
+            ";
+            $query = $db->query($sql,[$id_role,$user_name]);
+            $json['message'] = "User successfully add from this role";
+        }
+        
+        return $this->respond($json, 200);
+    }
+    
+    
     public function RemoveUser($id_role,$user_name){
 
         $json['error'] = 0;

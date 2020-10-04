@@ -305,3 +305,129 @@ jQuery(document).ready(function() {
     KTRoleEdit.init();    
     KTDatatablesDataSourceAjaxClient.init();
 });
+
+function addUserModalAction(user_name){
+    $.ajax({
+		url: BASE_URL + "/Roles/AddUser/" + $("#id").val() + "/" + user_name,
+		dataType: "json",
+		cache: false,
+		contentType: false,
+		processData: false
+	})
+	.done(function(res){
+		console.log(res);
+		if(res.error>0){
+			swal.fire({
+				html: res.message,
+				icon: "error",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			}).then(function() {
+				KTRoleEdit.initRole(res.id_role);
+			});
+			return;
+		} else {
+			swal.fire({
+				html: res.message,
+				icon: "success",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			}).then(function() {
+				console.log("Refrescar la tabla");
+				KTRoleEdit.initRole(res.id_role);
+			});
+			return;
+		}
+	});
+}
+
+var addUserModalTableInit = function() {
+
+	var initTable1 = function() {
+        var table = $('#addUserModalTable');
+        
+        table.DataTable().destroy();
+
+        var conditionSearch = $("#addUserModalSearch").val();
+
+		// begin first table
+		table.DataTable({
+            responsive: true,
+            searching: false,
+            bLengthChange: false,
+            pageLength: 5,
+			ajax: {
+				url: BASE_URL + '/Users/Find',
+				type: 'POST',
+				data: {
+                    condition : conditionSearch,
+					pagination: {
+						perpage: 10,
+					},
+				},
+			},
+			columns: [
+				{data: 'user_name'},
+				{data: 'actions', responsivePriority: -1},
+			],
+			columnDefs: [
+				{
+                    targets: -1,
+                    "width": "50px",
+					title: '\
+                        <a href="javascript:;" class="btn btn-sm btn-clean btn-icon" title="Delete">\
+                            <i class="la la-plus"></i>\
+                        </a>\
+                        ',
+					orderable: false,
+					render: function(data, type, full, meta) {
+                        console.log(full);
+						return '\
+							<a href="javascript:addUserModalAction(\'' + full.user_name + '\');" class="btn btn-sm btn-clean btn-icon" title="Delete">\
+								<i class="la la-plus"></i>\
+							</a>\
+						';
+					},
+				},{
+                    targets: -2,
+					render: function(data, type, full, meta) {
+                        console.log(full);
+						return '\
+							<strong>' + full.first_name + ' ' + full.last_name + '</strong> (' + full.user_name + ') <br>\
+							' + full.job_description + '\
+							\
+						';
+					},
+				},				
+			],
+		});
+	};
+
+	return {
+
+		//main function to initiate the module
+		init: function() {
+			initTable1();
+		},
+
+	};
+
+}();
+
+$("#addUserModalSearch" ).keyup(function() {
+    if($("#addUserModalSearch" ).val().length>2){
+        addUserModalTableInit.init();
+    }
+});
+
+function showAddUserModal(){
+    $("#addUserModal").modal("show");
+    $("#addUserModalSearch").val("");
+    addUserModalTableInit.init();
+}

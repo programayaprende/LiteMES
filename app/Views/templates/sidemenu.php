@@ -308,16 +308,7 @@
 														</li>																											
 													</ul>
 												</div>
-											</li>
-
-											<li class="menu-item" aria-haspopup="true">
-												<a href="custom/apps/inbox.html" class="menu-link">
-													<i class="menu-bullet menu-bullet-line">
-														<span></span>
-													</i>
-													<span class="menu-text">Permissions</span>													
-												</a>
-											</li>											
+											</li>										
 										</ul>
 									</div>
 								</li>

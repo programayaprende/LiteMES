@@ -99,6 +99,38 @@ class Users extends SecureController{
         return $this->respond($json, 200);
     }
 
+    public function Find(){
+
+        $db = db_connect();
+        
+        $json['error'] = 0;
+        
+        $sql = "
+        select user_name,first_name,last_name,job_description from ma_users 
+        where 
+            user_name like '%".$db->escapeLikeString($this->request->getVar('condition'))."%' or
+            first_name like '%".$db->escapeLikeString($this->request->getVar('condition'))."%' or
+            last_name like '%".$db->escapeLikeString($this->request->getVar('condition'))."%' or 
+            job_description like '%".$db->escapeLikeString($this->request->getVar('condition'))."%'
+        order by user_name
+        limit 100
+        ";
+
+        $query = $db->query($sql);
+
+        $users = [];
+
+        foreach ($query->getResultArray() as $row)
+        {
+            $row['actions'] = null;
+            $users[] = $row;
+        }
+
+        $json['data'] = $users;
+        
+        return $this->respond($json, 200);
+    }
+
     public function GetUsers(){
         
         $userModel = new UserModel();
@@ -107,7 +139,7 @@ class Users extends SecureController{
         //$extra['header'] =  $this->request->getHeaders();
         //$extra['segment'] = $this->request->uri->getSegments();
         
-        $data = $alldata = $userModel->findAll();
+        //$data = $alldata = $userModel->findAll();
 
         //Datos enviados por DataTable
         $datatable = array_merge(array('pagination' => array(), 'sort' => array(), 'query' => array()), $_REQUEST);

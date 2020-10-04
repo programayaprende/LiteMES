@@ -1,3 +1,34 @@
+					<!-- Modal-->
+					<div class="modal fade" id="addUserModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdrop" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="addUserModalLabel">+ Add User</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<i aria-hidden="true" class="ki ki-close"></i>
+									</button>
+								</div>
+								<div id="addUserModalBody" class="modal-body">
+									<div class="form-group mb-0">
+										<input type="text" class="form-control form-control-solid" placeholder="Search User" id="addUserModalSearch">
+									</div>
+									<!--begin: Datatable-->
+									<table class="table table-bordered table-hover table-checkable" id="addUserModalTable" style="margin-top: 13px !important">
+										<thead>
+											<tr>
+												<th>User</th>												
+												<th>...</th>
+											</tr>
+										</thead>
+									</table>
+									<!--end: Datatable-->
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>									
+								</div>
+							</div>
+						</div>
+					</div>
 					<!--begin::Content-->
 					<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 						<!--begin::Subheader-->
@@ -137,7 +168,7 @@
 												<!--end::Item-->
 												<!--begin::Item-->
 												<li class="nav-item mr-3 edit-role d-none">
-													<a class="nav-link" href="javascript://">
+													<a class="nav-link" href="javascript:showAddUserModal();">
 														<span class="nav-icon">
 															<span class="svg-icon">
 																<!--begin::Svg Icon | path:assets/media/svg/icons/Communication/Shield-role.svg-->
@@ -291,7 +322,7 @@
 																<div class="alert-icon">
 																	<i class="flaticon-warning"></i>
 																</div>
-																<div class="alert-text font-weight-bold">Removing a user from this list will immediately take effect, not need to press Save Changes button</div>
+																<div class="alert-text font-weight-bold">Adding or removing an user from this list will immediately take effect, not need to press Save Changes button</div>
 																<div class="alert-close">
 																	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 																		<span aria-hidden="true">
