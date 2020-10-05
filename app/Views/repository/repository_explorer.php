@@ -13,8 +13,13 @@
 									<form id="addFileModalForm" action="http://localhost/Repository/FileUpload" method="post">										
 										<div class="form-group">
 											<label class="">Files description</label>
-											<textarea class="form-control" id="filesDescription" name="filesDescription" rows="3" placeholder="Files description or information"></textarea>
+											<input type="text" class="form-control" id="filesDescription" name="filesDescription" placeholder="Files description or information">
 											<span class="form-text text-muted">Files description or information, this information is used to improve file searching</span>
+										</div>
+										<div class="form-group">
+											<label class="">Tags</label>
+											<input type="text" class="form-control" id="filesTags" name="filesTags" placeholder="Tags comma separed">
+											<span class="form-text text-muted">Tags to identify the files</span>
 										</div>
 										<div id="filesAdded">
 										</div>

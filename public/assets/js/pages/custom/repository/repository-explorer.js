@@ -249,7 +249,8 @@ function saveFiles(){
 				myDropzone5.removeAllFiles();
 				$("#addFileModal").modal("hide");
 				$("#filesAdded").html('');
-				$("#filesDescription").val('');				
+				$("#filesDescription").val('');
+				$("#filesTags").val('');
 			});
 			return;
 		}

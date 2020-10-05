@@ -71,19 +71,20 @@ class Repository extends SecureController{
             rename($row['tmp_file_path'],$newFullPath);
 
             $insert = "
-            insert into sys_files_upload(id,file_name,file_type,file_size,upload_dt,user_name,sys_file_name,file_path,description,id_grp)
+            insert into sys_files_upload(id,file_name,file_type,file_size,upload_dt,user_name,sys_file_name,file_path,description,id_grp,tags)
             values
             (
                 ".$db->escape($row['id']).",
                 ".$db->escape($row['file_name']).",
                 ".$db->escape($row['file_type']).",
                 ".$db->escape($row['file_size']).",
-                ".$db->escape($row['upload_dt']).",
+                now(),
                 ".$db->escape($row['user_name']).",
                 ".$db->escape($row['sys_file_name']).",
                 ".$db->escape($newFullPath).",
                 ".$db->escape($_POST['filesDescription']).",
-                ".$db->escape($id_grp)."
+                ".$db->escape($id_grp).",
+                ".$db->escape($_POST['filesTags'])."
             )
             ";          
 
