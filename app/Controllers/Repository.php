@@ -1,27 +1,143 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
-use App\Models\RoleModel;
 
-class Roles extends SecureController{
+class Repository extends SecureController{
 
     use ResponseTrait;
+  
 
     public function index(){
-        header("Location: ".base_url("/Roles/List"));
+        header("Location: ".base_url("/Repository/Explorer"));
 		die();
     }
 
-    public function List(){
+    public function Explorer(){
         $data = [];
-        $data['page_title']= "Query Roles";
+        $data['page_title']= "File Repository";
 
-        $data['js_files'][] = '<script>var KTAppSettings = { "breakpoints": { "sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400 }, "colors": { "theme": { "base": { "white": "#ffffff", "primary": "#3699FF", "secondary": "#E5EAEE", "success": "#1BC5BD", "info": "#8950FC", "warning": "#FFA800", "danger": "#F64E60", "light": "#E4E6EF", "dark": "#181C32" }, "light": { "white": "#ffffff", "primary": "#E1F0FF", "secondary": "#EBEDF3", "success": "#C9F7F5", "info": "#EEE5FF", "warning": "#FFF4DE", "danger": "#FFE2E5", "light": "#F3F6F9", "dark": "#D6D6E0" }, "inverse": { "white": "#ffffff", "primary": "#ffffff", "secondary": "#3F4254", "success": "#ffffff", "info": "#ffffff", "warning": "#ffffff", "danger": "#ffffff", "light": "#464E5F", "dark": "#ffffff" } }, "gray": { "gray-100": "#F3F6F9", "gray-200": "#EBEDF3", "gray-300": "#E4E6EF", "gray-400": "#D1D3E0", "gray-500": "#B5B5C3", "gray-600": "#7E8299", "gray-700": "#5E6278", "gray-800": "#3F4254", "gray-900": "#181C32" } }, "font-family": "Poppins" };</script>';        
-        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/role/role-list.js"></script>';
+        $data['js_files'][] = '<script>var KTAppSettings = { "breakpoints": { "sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400 }, "colors": { "theme": { "base": { "white": "#ffffff", "primary": "#3699FF", "secondary": "#E5EAEE", "success": "#1BC5BD", "info": "#8950FC", "warning": "#FFA800", "danger": "#F64E60", "light": "#E4E6EF", "dark": "#181C32" }, "light": { "white": "#ffffff", "primary": "#E1F0FF", "secondary": "#EBEDF3", "success": "#C9F7F5", "info": "#EEE5FF", "warning": "#FFF4DE", "danger": "#FFE2E5", "light": "#F3F6F9", "dark": "#D6D6E0" }, "inverse": { "white": "#ffffff", "primary": "#ffffff", "secondary": "#3F4254", "success": "#ffffff", "info": "#ffffff", "warning": "#ffffff", "danger": "#ffffff", "light": "#464E5F", "dark": "#ffffff" } }, "gray": { "gray-100": "#F3F6F9", "gray-200": "#EBEDF3", "gray-300": "#E4E6EF", "gray-400": "#D1D3E0", "gray-500": "#B5B5C3", "gray-600": "#7E8299", "gray-700": "#5E6278", "gray-800": "#3F4254", "gray-900": "#181C32" } }, "font-family": "Poppins" };</script>';
+        
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/crud/file-upload/repository-explorer.js"></script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/repository/repository-explorer.js"></script>';
+        
+        
        
         echo view("templates/header",$data);
-        echo view("roles/role_list.php",$data);
+        echo view("repository/repository_explorer.php",$data);
         echo view("templates/footer",$data);
+    }
+
+    public function FileUpload(){
+
+        $id_grp = time();
+                
+        $json['error'] = 0;
+        $json['message'] = '';
+
+        $db = db_connect();
+
+        if(!$_POST['files_id']){
+            $json['error'] = "1";
+            $json['message'] = "No files have been found to save";
+            return $this->respond($json, 200);    
+        }
+
+        foreach($_POST['files_id'] as $id_file){
+            $sql = "
+            select 
+                a.*, 
+                year(upload_dt) as upload_year,
+                month(upload_dt) as upload_month,
+                day(upload_dt) as upload_day 
+            from 
+                sys_files_upload_tmp a where id = ?
+            ";
+            $query = $db->query($sql,[$id_file]);
+
+            $row = $query->getRowArray();
+
+            if(!$row){
+                continue;
+            }
+
+            //Mover a su locacion final
+            $newPath = WRITEPATH.'uploads\\repository\\'.$row['upload_year'].'\\'.$row['upload_month'].'\\'.$row['id'];
+
+            mkdir($newPath,0777,true);
+
+            $newFullPath = $newPath.'\\'.$row['sys_file_name'];
+
+            rename($row['tmp_file_path'],$newFullPath);
+
+            $insert = "
+            insert into sys_files_upload(id,file_name,file_type,file_size,upload_dt,user_name,sys_file_name,file_path,description,id_grp)
+            values
+            (
+                ".$db->escape($row['id']).",
+                ".$db->escape($row['file_name']).",
+                ".$db->escape($row['file_type']).",
+                ".$db->escape($row['file_size']).",
+                ".$db->escape($row['upload_dt']).",
+                ".$db->escape($row['user_name']).",
+                ".$db->escape($row['sys_file_name']).",
+                ".$db->escape($newFullPath).",
+                ".$db->escape($_POST['filesDescription']).",
+                ".$db->escape($id_grp)."
+            )
+            ";          
+
+            $query = $db->query($insert);
+        }
+        $json['message'] = 'Files successfully upload';
+        return $this->respond($json, 200);
+    }
+
+    public function TempFileUpload(){
+        $json['error'] = 0;
+        $json['message'] = "";
+        $file = $this->request->getFile('file');
+
+        $time = time();
+                        
+        if (! $file->isValid())
+        {
+            $json['error'] = "Invalid file...";
+            $json['message'] = "Invalid file";
+            return $this->respond($json, 500);
+        }
+
+        $name = $file->getName();
+        $clientName = $file->getClientName();
+        $tempName = $file->getTempName();
+        $ext = $file->getClientExtension();
+        $type = $file->getClientMimeType();
+
+        $sys_file_name = $time."_".$clientName;
+        $file->move(WRITEPATH.'uploads/'.session_id(),$sys_file_name);
+        
+        if(!file_exists(WRITEPATH.'uploads\\'.session_id()."\\".$sys_file_name)){
+            $json['error'] = "Error saving the file";
+            $json['message'] = "Error saving the file";
+            return $this->respond($json, 500);
+        }
+
+        //Guardar en base de datos
+
+        $db = db_connect();
+
+        $sql = "
+        insert into sys_files_upload_tmp(file_name,file_type,file_size,upload_dt,user_name,sys_file_name,tmp_file_path)
+        values (?,?,?,now(),?,?,?)
+        ";
+
+        $query = $db->query($sql,[$clientName,$type,0,session()->get('user_name'),$sys_file_name,WRITEPATH.'uploads\\'.session_id()."\\".$sys_file_name]);
+
+        $json['id'] = $db->insertID();
+        $json['success'] = "File successfully store in the server";
+        $json['message'] = "File successfully store in the server";
+        return $this->respond($json, 200);
+
     }
 
     public function AddUser($id_role,$user_name){
@@ -183,7 +299,7 @@ class Roles extends SecureController{
 
     }
 
-    public function GetRoles(){
+    public function GetFiles(){
         
         $roleModel = new RoleModel();
         $extra = [];

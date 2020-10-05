@@ -715,8 +715,16 @@
 										<ul class="menu-subnav">
 											<li class="menu-item menu-item-parent" aria-haspopup="true">
 												<span class="menu-link">
-													<span class="menu-text">File Explorer</span>
+													<span class="menu-text">File Repository</span>
 												</span>
+											</li>
+											<li class="menu-item" aria-haspopup="true">
+												<a href="<?=base_url("Repository/Explorer")?>" class="menu-link">
+													<i class="menu-bullet menu-bullet-dot">
+														<span></span>
+													</i>
+													<span class="menu-text">Explorer</span>
+												</a>
 											</li>
 											<li class="menu-item" aria-haspopup="true">
 												<a href="layout/themes/aside-light.html" class="menu-link">
@@ -725,23 +733,7 @@
 													</i>
 													<span class="menu-text">Add File</span>
 												</a>
-											</li>
-											<li class="menu-item" aria-haspopup="true">
-												<a href="layout/themes/aside-light.html" class="menu-link">
-													<i class="menu-bullet menu-bullet-dot">
-														<span></span>
-													</i>
-													<span class="menu-text">Update File</span>
-												</a>
-											</li>
-											<li class="menu-item" aria-haspopup="true">
-												<a href="layout/themes/aside-light.html" class="menu-link">
-													<i class="menu-bullet menu-bullet-dot">
-														<span></span>
-													</i>
-													<span class="menu-text">Remove File</span>
-												</a>
-											</li>
+											</li>											
 										</ul>
 									</div>
 								</li>							

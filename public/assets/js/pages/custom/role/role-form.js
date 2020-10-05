@@ -312,7 +312,19 @@ function addUserModalAction(user_name){
 		dataType: "json",
 		cache: false,
 		contentType: false,
-		processData: false
+        processData: false,
+        error: function (xhr, error, code)
+        {            
+            swal.fire({
+				html: code,
+				icon: "error",
+				buttonsStyling: false,
+				confirmButtonText: "Ok, got it!",
+				customClass: {
+					confirmButton: "btn font-weight-bold btn-light-primary"
+				}
+			});
+        },
 	})
 	.done(function(res){
 		console.log(res);
@@ -366,11 +378,8 @@ var addUserModalTableInit = function() {
 				url: BASE_URL + '/Users/Find',
 				type: 'POST',
 				data: {
-                    condition : conditionSearch,
-					pagination: {
-						perpage: 10,
-					},
-				},
+                    condition : conditionSearch
+                },
 			},
 			columns: [
 				{data: 'user_name'},
