@@ -139,39 +139,7 @@ class Repository extends SecureController{
         $json['message'] = "File successfully store in the server";
         return $this->respond($json, 200);
 
-    }
-
-    public function AddUser($id_role,$user_name){
-
-        $json['error'] = 0;
-        $json['message'] = "";
-        $json['id_role'] = $id_role;
-        $json['user_name'] = $user_name;
-
-        $db = db_connect();
-
-        $sql = "
-        select count(*) as CNT from lnk_users_roles where id_role = ? and user_name = ?
-        ";
-
-        $query = $db->query($sql,[$id_role,$user_name]);
-
-        $result = $query->getRowArray();
-
-        if($result['CNT']>0){
-            $json['error'] = 1;
-            $json['message'] = "User already in this role user list";
-        } else {
-            $sql = "
-            insert into lnk_users_roles(id_role,user_name,created_at) values (?,?,now())
-            ";
-            $query = $db->query($sql,[$id_role,$user_name]);
-            $json['message'] = "User successfully add to this role";
-        }
-        
-        return $this->respond($json, 200);
-    }
-    
+    }    
     
     public function RemoveUser($id_role,$user_name){
 
@@ -302,84 +270,32 @@ class Repository extends SecureController{
 
     public function GetFiles(){
         
-        $roleModel = new RoleModel();
-        $extra = [];
-        
-        //Datos enviados por DataTable
-        $datatable = array_merge(array('pagination' => array(), 'sort' => array(), 'query' => array()), $_REQUEST);
+        $json['error'] = 0;
+        $json['message'] = '';
 
-        //Inicializar el constructor del query
-        $dataBuilder = $roleModel->builder();
-        $dataBuilder->select('id,name,description,date(created_at) as created_at');
+        $db = db_connect();
 
-        // Se mando un filtro desde la cabecera del modulo
-        $filter = isset($datatable['query']['generalSearch']) && is_string($datatable['query']['generalSearch']) ? $datatable['query']['generalSearch'] : '';
-        if (!empty($filter)) {
-            $dataBuilder->orLike('name',$filter);
-            $dataBuilder->orLike('description',$filter);            
-            unset($datatable['query']['generalSearch']);
-        } else {
-            foreach($_REQUEST as $field=>$value){
-                
-                if(substr($field,0,7)!="filter_" or $value==""){
-                    continue;
-                }
-                switch($field){
-                    case "filter_name":
-                        $condition = "(name like '%".$value."%' or description like '%".$value."%')";
-                        $dataBuilder->where($condition);
-                        break;                    
-                }
-            }
-        }
-        
-        //Checar si se mando info para el sort
-        $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'asc';
-        $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'name';
+        $_POST['description'] = (!isset($_POST['description'])) ? "" : $_POST['description'];
+        $_POST['tags'] = (!isset($_POST['tags'])) ? "" : $_POST['tags'];
 
-        //Aplicar el sort en el query
-        $dataBuilder->orderBy($field, $sort);
+        $sql = "
+        select id_grp,count(*),description,tags , date(upload_dt) as upload_dt,user_name from sys_files_upload 
+        where user_name = ? and  (description like '%".$db->escapeLikeString($_POST['description'])."%' or tags like '%".$db->escapeLikeString($_POST['tags'])."%')
+        group by id_grp 
+        limit 100
+        ";
 
-        //Revisar que pagina quieren ver        
-        $page = !empty($datatable['pagination']['page']) ? (int)$datatable['pagination']['page'] : 1;
-        //Revisar cuantos items por pagina
-        $perpage = !empty($datatable['pagination']['perpage']) ? (int)$datatable['pagination']['perpage'] : -1;
+        $query = $db->query($sql,[session()->get('user_name')]);
 
-        $pages = 1;
-        $total = $dataBuilder->countAllResults(false);
+        $rows = [];
 
-        if ($perpage > 0) {
-            $pages = ceil($total / $perpage); // calculate total pages
-            $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-            $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-            $offset = ($page - 1) * $perpage;
-            if ($offset < 0) {
-                $offset = 0;
-            }                        
-            $selectQuery = $dataBuilder->limit($perpage, $offset);
+        foreach($query->getResultArray() as $row){
+            $rows[] = $row;
         }
 
-        $selectQuery =  $dataBuilder->getCompiledSelect(false);
-
-        $data = [];
-        $data = $dataBuilder->get()->getResultArray();;
-
-        $meta = array(
-            'page' => $page,
-            'pages' => $pages,
-            'perpage' => $perpage,
-            'total' => $total,
-        );     
-
-        $result = array(
-            'meta' => $meta + array(
-                'sort' => $sort,
-                'field' => $field,
-            ),
-            'data' => $data
-        );
+        $json['data'] = $rows;
         
-        echo json_encode($result, JSON_PRETTY_PRINT);
+        echo json_encode($json, JSON_PRETTY_PRINT);
 
     }
 
