@@ -6,7 +6,8 @@ var KTAppInbox = function() {
     var _asideEl;
     var _listEl;
     var _viewEl;
-    var _composeEl;
+    var _newEl;
+    var _toolbarEl;
     var _replyEl;
     var _asideOffcanvas;
 
@@ -381,14 +382,50 @@ var KTAppInbox = function() {
             _asideEl = KTUtil.getById('kt_inbox_aside');
             _listEl = KTUtil.getById('kt_inbox_list');
             _viewEl = KTUtil.getById('kt_inbox_view');
-            _composeEl = KTUtil.getById('kt_inbox_compose');
+            _newEl = KTUtil.getById('kt_inbox_new');
+            _toolbarEl = KTUtil.getById('kt_subheader');
             _replyEl = KTUtil.getById('kt_inbox_reply');
 
             // Init handlers
             KTAppInbox.initAside();
             KTAppInbox.initList();
             KTAppInbox.initView();
-            KTAppInbox.initReply();            
+            KTAppInbox.initNew();
+            KTAppInbox.initReply(); 
+                        
+            KTUtil.on(_toolbarEl, '.btn-new-approval', 'click', function(e) {
+                
+                // demo loading
+                var loading = new KTDialog({
+                    'type': 'loader',
+                    'placement': 'top center',
+                    'message': 'Loading ...'
+                });
+                loading.show();
+
+                setTimeout(function() {
+                    loading.hide();
+
+                    //Inicializar el formulario de un nuevo approval
+                    //TO-DO
+
+                    //Ocultar lista
+                    KTUtil.addClass(_listEl, 'd-none');
+                    KTUtil.removeClass(_listEl, 'd-block');
+
+                    //Ocultar view
+                    KTUtil.addClass(_viewEl, 'd-none');
+                    KTUtil.removeClass(_viewEl, 'd-block');
+
+                    //Mostrar new
+                    KTUtil.addClass(_newEl, 'd-block');
+                    KTUtil.removeClass(_newEl, 'd-none');
+                    
+                    
+                }, 600);
+                
+            });
+            
         },
 
         initAside: function() {
@@ -512,6 +549,56 @@ var KTAppInbox = function() {
 
             // Expand/Collapse reply
             KTUtil.on(_viewEl, '[data-inbox="message"]', 'click', function(e) {
+                var message = this.closest('[data-inbox="message"]');
+
+                var dropdownToggleEl = KTUtil.find(this, '[data-toggle="dropdown"]');
+                var toolbarEl = KTUtil.find(this, '[data-inbox="toolbar"]');
+
+                // skip dropdown toggle click
+                if (e.target === dropdownToggleEl || (dropdownToggleEl && dropdownToggleEl.contains(e.target) === true)) {
+                    return false;
+                }
+
+                // skip group actions click
+                if (e.target === toolbarEl || (toolbarEl && toolbarEl.contains(e.target) === true)) {
+                    return false;
+                }
+
+                if (KTUtil.hasClass(message, 'toggle-on')) {
+                    KTUtil.addClass(message, 'toggle-off');
+                    KTUtil.removeClass(message, 'toggle-on');
+                } else {
+                    KTUtil.removeClass(message, 'toggle-off');
+                    KTUtil.addClass(message, 'toggle-on');
+                }
+            });
+        },
+
+        initNew: function() {
+            // Back to listing
+            KTUtil.on(_newEl, '[data-inbox="back"]', 'click', function() {
+                // demo loading
+                var loading = new KTDialog({
+                    'type': 'loader',
+                    'placement': 'top center',
+                    'message': 'Loading ...'
+                });
+
+                loading.show();
+
+                setTimeout(function() {
+                    loading.hide();
+
+                    KTUtil.addClass(_listEl, 'd-block');
+                    KTUtil.removeClass(_listEl, 'd-none');
+
+                    KTUtil.addClass(_newEl, 'd-none');
+                    KTUtil.removeClass(_newEl, 'd-block');
+                }, 700);
+            });
+
+            // Expand/Collapse reply
+            KTUtil.on(_newEl, '[data-inbox="message"]', 'click', function(e) {
                 var message = this.closest('[data-inbox="message"]');
 
                 var dropdownToggleEl = KTUtil.find(this, '[data-toggle="dropdown"]');
