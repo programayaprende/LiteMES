@@ -137,6 +137,7 @@
                 <!--end::Aside-->
                 <?= view_cell("App\Libraries\UIApprovals::List") ?>
                 <?= view_cell("App\Libraries\UIApprovals::View") ?>
+                <?= view_cell("App\Libraries\UIApprovals::New") ?>
             </div>
             <!--end::Inbox-->            
         </div>

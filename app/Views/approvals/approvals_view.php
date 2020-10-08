@@ -1,5 +1,5 @@
-                <!--begin::New-->
-                <div class="flex-row-fluid ml-lg-8 d-none" id="kt_inbox_new">
+                <!--begin::View-->
+                <div class="flex-row-fluid ml-lg-8 d-none" id="kt_inbox_view">
                     <!--begin::Card-->
                     <div class="card card-custom card-stretch">
                         <!--begin::Header-->
