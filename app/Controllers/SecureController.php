@@ -51,6 +51,9 @@ class SecureController extends Controller
 
 		$segments = $this->request->uri->getSegments();
 
+		$controller="";
+		$action="";
+
 		if(count($segments)>=2){
 			$controller = $segments[0];
 			$action = $segments[1]; 

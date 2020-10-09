@@ -44,7 +44,7 @@
                                             <div class="input-group input-group-solid">
                                                 <input type="text" class="form-control border-0" placeholder="Search for user to add to the approval path">
                                                 <div class="input-group-append">
-                                                    <button class="btn btn-primary" type="button">Add+</button>
+                                                    <button class="btn btn-primary" type="button">Add User</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -53,10 +53,13 @@
                                     <!--end::Add User-->
                                     <!--begin::Users List-->
                                     <div class="align-items-center border-bottom inbox-to-cc p-0 pr-5 min-h-50px">
-                                        <table class="table">
+                                        <table class="table mb-0">
                                             <thead>
                                                 <tr>                                                    
-                                                    <th scope="col" colspan="3">Approval Path</th>                                                    
+                                                    <th scope="col" class="pl-8">Action Request</th>
+                                                    <th>User</th>
+                                                    <th>Job</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -74,11 +77,14 @@
                                                             <span></span>Notification</label>
                                                         </div>
                                                     </td>
-                                                    <td>Jonathan Araiza (j.araiza)</td>                                                    
+                                                    <td>Jonathan Araiza (j.araiza)</td>
+                                                    <td>Sr. App Developer</td>
                                                     <td>
-                                                        <span class="label label-inline label-light-primary font-weight-bold">
-                                                            Pending
+                                                        <a href="#">
+                                                        <span class="label label-inline label-light-danger font-weight-bold">
+                                                            Remove
                                                         </span>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -96,10 +102,13 @@
                                                         </div>
                                                     </td>
                                                     <td>Jonathan Araiza (j.araiza)</td>
+                                                    <td>Production Manager</td>
                                                     <td>
-                                                        <span class="label label-inline label-light-success font-weight-bold">
-                                                            Approved
+                                                        <a href="#">
+                                                        <span class="label label-inline label-light-danger font-weight-bold">
+                                                            Remove
                                                         </span>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -117,21 +126,24 @@
                                                         </div>
                                                     </td>
                                                     <td>Jonathan Araiza (j.araiza)</td>
+                                                    <td>Quality Manager</td>
                                                     <td>
+                                                        <a href="#">
                                                         <span class="label label-inline label-light-danger font-weight-bold">
-                                                            New
+                                                            Remove
                                                         </span>
+                                                        </a>
                                                     </td>
-                                                </tr>
+                                                </tr>                                                                                                
                                             </tbody>
                                         </table>
                                     </div>
                                     <!--end::User List-->
                                     <!--begin::Message-->
-                                    <div id="kt_inbox_reply_editor" class="border-0" style="height: 250px"></div>
+                                    <div id="kt_inbox_new_editor" class="border-0" style="height: 250px"></div>
                                     <!--end::Message-->
                                     <!--begin::Attachments-->
-                                    <div class="dropzone dropzone-multi px-8 py-4" id="kt_inbox_reply_attachments">
+                                    <div class="dropzone dropzone-multi px-8 py-4" id="kt_inbox_new_attachments">
                                         <div class="dropzone-items">
                                             <div class="dropzone-item" style="display:none">
                                                 <div class="dropzone-file">
@@ -197,7 +209,7 @@
                                         </div>
                                         <!--end::Send-->
                                         <!--begin::Other-->
-                                        <span class="btn btn-icon btn-sm btn-clean mr-2" id="kt_inbox_reply_attachments_select">
+                                        <span class="btn btn-icon btn-sm btn-clean mr-2" id="kt_inbox_new_attachments_select">
                                             <i class="flaticon2-clip-symbol"></i>
                                         </span>
                                         <span class="btn btn-icon btn-sm btn-clean">

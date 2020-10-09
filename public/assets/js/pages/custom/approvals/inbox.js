@@ -626,7 +626,9 @@ var KTAppInbox = function() {
 
         initReply: function() {
             _initEditor(_replyEl, 'kt_inbox_reply_editor');
+            _initEditor(_newEl, 'kt_inbox_new_editor');
             _initAttachments('kt_inbox_reply_attachments');
+            _initAttachments('kt_inbox_new_attachments');
             _initForm('kt_inbox_reply_form');
         },        
     };
