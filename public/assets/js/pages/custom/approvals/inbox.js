@@ -7,9 +7,9 @@ var KTAppInbox = function() {
     var _listEl;
     var _viewEl;
     var _newEl;
-    var _toolbarEl;
-    var _replyEl;
+    var _toolbarEl;    
     var _asideOffcanvas;
+    var _approval_hash_new;
 
     // Private methods
     var _initEditor = function(form, editor) {
@@ -374,6 +374,104 @@ var KTAppInbox = function() {
         });
     }
 
+    var _initPage = function() {
+        console.log("_initPage");
+        KTUtil.removeClass(_listEl, 'd-block');
+        KTUtil.removeClass(_viewEl, 'd-block');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        KTUtil.addClass(_listEl, 'd-none');
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.addClass(_newEl, 'd-none');
+    }
+
+    var _startNew = function(){
+
+        console.log("_startNew");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar lista
+        KTUtil.addClass(_listEl, 'd-none');
+        KTUtil.removeClass(_listEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+
+        $('#approval_new_form').trigger("reset");
+        var editor = new Quill('#kt_inbox_new_editor');
+        editor.setText('');
+
+        $("#approval_path_new tbody").html('<tr><td colspan="4" class="pl-8 text-center">Approval path is empty, select action and add a user</td></tr>');
+
+        $.ajax({
+            url: BASE_URL + "/Approvals/CreateDraft",
+            dataType: "json",
+            success: function(data){
+                loading.hide();
+
+                console.log(data);
+
+                if(data.error==1){
+                    alert('Error creating a approval');
+                    return;
+                }
+                _approval_hash_new = data.approval_hash;
+                $("#kt_inbox_new #approval_hash").val(data.approval_hash);
+                
+                //Mostrar new
+
+                KTUtil.addClass(_newEl, 'd-block');
+                KTUtil.removeClass(_newEl, 'd-none');
+            }            
+        });
+
+        
+    }
+
+    var _addUser = function(new_user_name){
+        $.ajax({
+            url: BASE_URL + "/Approvals/AddToPath",
+            data: { user_name: new_user_name, approval_hash: _approval_hash_new},
+            dataType: "json",
+            success: function(data){                
+                console.log(data);
+                
+                if(data.error==1){
+                    alert('Error getting approval path');
+                    return;
+                }                
+                
+                _drawApprovalPath();
+            }            
+        });
+    }
+
+    var _drawApprovalPath = function(){
+        $.ajax({
+            url: BASE_URL + "/Approvals/GetPath",
+            data: { approval_hash: _approval_hash_new},
+            dataType: "json",
+            success: function(data){                
+                console.log(data);
+                
+                if(data.error==1){
+                    alert('Error getting approval path');
+                    return;
+                }                
+            }            
+        });
+    }
+
+    
+
     // Public methods
     return {
         // Public functions
@@ -384,47 +482,22 @@ var KTAppInbox = function() {
             _viewEl = KTUtil.getById('kt_inbox_view');
             _newEl = KTUtil.getById('kt_inbox_new');
             _toolbarEl = KTUtil.getById('kt_subheader');
-            _replyEl = KTUtil.getById('kt_inbox_reply');
+
+            _initPage();
 
             // Init handlers
             KTAppInbox.initAside();
             KTAppInbox.initList();
             KTAppInbox.initView();
-            KTAppInbox.initNew();
-            KTAppInbox.initReply(); 
+            KTAppInbox.initNew();            
                         
-            KTUtil.on(_toolbarEl, '.btn-new-approval', 'click', function(e) {
-                
-                // demo loading
-                var loading = new KTDialog({
-                    'type': 'loader',
-                    'placement': 'top center',
-                    'message': 'Loading ...'
-                });
-                loading.show();
-
-                setTimeout(function() {
-                    loading.hide();
-
-                    //Inicializar el formulario de un nuevo approval
-                    //TO-DO
-
-                    //Ocultar lista
-                    KTUtil.addClass(_listEl, 'd-none');
-                    KTUtil.removeClass(_listEl, 'd-block');
-
-                    //Ocultar view
-                    KTUtil.addClass(_viewEl, 'd-none');
-                    KTUtil.removeClass(_viewEl, 'd-block');
-
-                    //Mostrar new
-                    KTUtil.addClass(_newEl, 'd-block');
-                    KTUtil.removeClass(_newEl, 'd-none');
-                    
-                    
-                }, 600);
-                
+            KTUtil.on(_toolbarEl, '.btn-new-approval', 'click', function(e) {                
+                _startNew();                
             });
+
+            if(DEFAULT_ACTION=="new"){
+                _startNew();
+            }
             
         },
 
@@ -597,7 +670,37 @@ var KTAppInbox = function() {
                 }, 700);
             });
 
+            //'https://preview.keenthemes.com/metronic/theme/html/tools/preview/api/?file=typeahead/movies.json'
+            var usersList = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('user_name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                prefetch: "http://localhost/Users/Search",
+                remote: {
+                    url: 'http://localhost/Users/Search?condition=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#approval_user_new').typeahead(null, {
+                name: 'best-pictures',
+                display: 'user_name',
+                source: usersList,
+                templates: {
+                    empty: [
+                        '<div class="empty-message" style="padding: 10px 15px; text-align: center;">',
+                        'unable to find any users that match the current query',
+                        '</div>'
+                    ].join(''),
+                    suggestion: Handlebars.compile('<div><strong>{{first_name}} {{last_name}}</strong> ({{user_name}})<br>{{job_description}}</div>')
+                }
+            });
+
+            $('#approval_user_new').bind('typeahead:select', function(ev, suggestion) {                
+                _addUser(suggestion.user_name);
+            });
+
             // Expand/Collapse reply
+            /*
             KTUtil.on(_newEl, '[data-inbox="message"]', 'click', function(e) {
                 var message = this.closest('[data-inbox="message"]');
 
@@ -622,15 +725,11 @@ var KTAppInbox = function() {
                     KTUtil.addClass(message, 'toggle-on');
                 }
             });
-        },
+            */
 
-        initReply: function() {
-            _initEditor(_replyEl, 'kt_inbox_reply_editor');
-            _initEditor(_newEl, 'kt_inbox_new_editor');
-            _initAttachments('kt_inbox_reply_attachments');
-            _initAttachments('kt_inbox_new_attachments');
-            _initForm('kt_inbox_reply_form');
-        },        
+            _initEditor(_newEl, 'kt_inbox_new_editor');            
+            _initAttachments('kt_inbox_new_attachments');            
+        },
     };
 }();
 

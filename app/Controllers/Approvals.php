@@ -23,6 +23,108 @@ class Approvals extends SecureController{
         echo view("templates/footer",$data);
     }
 
+    public function AddToPath(){
+        
+        $db = db_connect();
+
+        $json['error'] = 0;
+        $json['message'] = "";
+
+        try {
+
+            //Obtener el ID del approval y revisar que este en modo draft y que sea del usuario actual
+            $select = "select * from md_approvals where approval_hash=? and drafter=? and status='Draft'";
+            
+            $query = $db->query($select,[$this->request->getVar('approval_hash'),session()->get('user_name')]);
+
+            $approval = $query->getRowArray();
+
+            if(!isset($approval)){
+                $json['message'] = "Approval not found...";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }            
+
+            //Revisar que no exista el usuario ya en la ruta de aprobacion
+            $select = "select count(user_name) as user_exists from md_approvals_users where id_approval=? and user_name=?";
+            
+            $query = $db->query($select,[$approval['id_approval'],$this->request->getVar('user_name')]);
+
+            $result = $query->getRowArray();
+
+            if($result['user_exists']>0){
+                $json['message'] = "User already in the path";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+            //Obtener el numero de secuencia            
+            $select = "select count(user_name) as user_count from md_approvals_users where id_approval=?";
+            
+            $query = $db->query($select,[$approval['id_approval']]);
+
+            $result = $query->getRowArray();
+
+            $seq = $result['user_count'] + 1;
+
+            //Insertar el usuario en la ruta de aprobacion
+            $insert = "insert into md_approvals_users(id_approval,user_name,approval_type,status,seq)
+            values (?,?,?,?,?)";
+            
+            $insert = $db->query($insert,[$approval['id_approval'],session()->get('user_name'),'Approval','-',$seq]);
+
+            //Verificar que se inserto
+            $select = "select count(user_name) as user_exists from md_approvals_users where id_approval=? and user_name=?";
+            
+            $query = $db->query($select,[$approval['id_approval'],$this->request->getVar('user_name')]);
+
+            $result = $query->getRowArray();
+
+            if($result['user_exists']==0){
+                $json['message'] = "Error inserting new user";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+            $json['message'] = "User successfully added to the approval path";
+            return $this->respond($json, 200);
+            
+
+        } catch (Exception $e) {
+            $json['message'] = "Error creating a new Approval";
+            $json['error']=1;
+            return $this->respond($json, 200);
+        }
+        
+    }
+
+    public function CreateDraft(){
+        $db = db_connect();
+
+        $json['error'] = 0;
+        $json['message'] = "";
+
+        try {
+            $insert = "insert into md_approvals(drafter,status,created_at)
+            values (?,'Draft',now())";
+            $insert = $db->query($insert,[session()->get('user_name')]);
+            
+            $json['id_approval'] = $id_approval = $db->insertID();
+            $json['approval_hash'] = $approval_hash = md5("approval_hash_".$id_approval);
+
+            $update = "update md_approvals set approval_hash=? where id_approval = ?";
+            $db->query($update,[$approval_hash,$id_approval]);
+        } catch (Exception $e) {
+            $json['message'] = "Error creating a new Approval";
+            $json['error']=1;
+            return $this->respond($json, 200);
+        }
+        
+
+        return $this->respond($json, 200);
+
+    }
+
     public function New(){      
                 
         //Informacion para el desplegado de la pagina

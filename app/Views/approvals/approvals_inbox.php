@@ -57,7 +57,7 @@
                                                 <!--end::Svg Icon-->
                                             </span>
                                         </span>
-                                        <span class="navi-text font-weight-bolder font-size-lg">My Inbox</span>
+                                        <span class="navi-text font-weight-bolder font-size-lg">Pending</span>
                                         <span class="navi-label">
                                             <span class="label label-rounded label-light-success font-weight-bolder">3</span>
                                         </span>
@@ -80,7 +80,7 @@
                                                 <!--end::Svg Icon-->
                                             </span>
                                         </span>
-                                        <span class="navi-text font-weight-bolder font-size-lg">Marked</span>
+                                        <span class="navi-text font-weight-bolder font-size-lg">Approved</span>
                                     </a>
                                 </div>
                                 <!--end::Item-->
@@ -100,7 +100,7 @@
                                                 <!--end::Svg Icon-->
                                             </span>
                                         </span>
-                                        <span class="navi-text font-weight-bolder font-size-lg">Draft</span>
+                                        <span class="navi-text font-weight-bolder font-size-lg">Notifications</span>
                                         <span class="navi-label">
                                             <span class="label label-rounded label-light-warning font-weight-bolder">5</span>
                                         </span>

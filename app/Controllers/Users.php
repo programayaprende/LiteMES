@@ -99,6 +99,40 @@ class Users extends SecureController{
         return $this->respond($json, 200);
     }
 
+    public function Search(){
+        $db = db_connect();
+
+        if(!isset($_REQUEST['condition'])){
+            $_REQUEST['condition'] = "";
+        }
+        
+        $sql = "
+        select user_name,first_name,last_name,job_description from ma_users 
+        where 
+            user_name like '%".$db->escapeLikeString($_REQUEST['condition'])."%' or
+            first_name like '%".$db->escapeLikeString($_REQUEST['condition'])."%' or
+            last_name like '%".$db->escapeLikeString($_REQUEST['condition'])."%' or 
+            job_description like '%".$db->escapeLikeString($_REQUEST['condition'])."%'
+        order by user_name
+        limit 10
+        ";
+
+        $query = $db->query($sql);
+
+        $users = [];
+
+        foreach ($query->getResultArray() as $row)
+        {
+            $row['tokens'][] = $row['user_name'];           
+            
+            $users[] = $row;
+        }
+
+        $json = $users;
+        
+        return $this->respond($json, 200);
+    }
+
     public function Find(){
 
         $db = db_connect();
