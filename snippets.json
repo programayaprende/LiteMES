@@ -1,0 +1,25 @@
+{
+    "For Loop": {
+        "prefix": ["jsonr"],
+        "body": ["$db = db_connect(); \n\r $json['error'] = 0; \n\r  $json['message'] = ''; \n\r  try { \n\r \n\r \n\r }catch(Exception $e){ \n\r $json['e'] = $e->getMessage(); \n\r  $json['message'] = 'Error message'; \n\r  $json['error']=1; \n\r return $this->respond($json, 200); \n\r }"],
+        "description": "A for loop."
+    }
+}
+
+
+
+
+$db = db_connect();
+
+$json['error'] = 0;
+$json['message'] = "";
+
+try {
+
+    return $this->respond($json, 200);
+}catch(Exception $e){
+    $json['e'] = $e->getMessage();
+    $json['message'] = "Error message";
+    $json['error']=1;
+    return $this->respond($json, 200);
+}

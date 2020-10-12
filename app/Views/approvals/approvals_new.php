@@ -1,6 +1,5 @@
                 <!--begin::New-->                
-                <div class="flex-row-fluid ml-lg-8 d-none" id="kt_inbox_new">
-                    <form id="approval_new_form">
+                <div class="flex-row-fluid ml-lg-8 d-none" id="kt_inbox_new">                    
                     <!--begin::Card-->
                     <div class="card card-custom card-stretch">
                         <!--begin::Header-->
@@ -17,7 +16,7 @@
                         <!--begin::Body-->
                         <div class="card-body p-0">
                             <!--begin::Form-->
-                            <form id="kt_inbox_reply_form">
+                            <form id="approval_new_form" method="post">
                                 <!--begin::Body-->
                                 <div class="d-block">
                                     <!--begin::Hash-->
@@ -25,6 +24,9 @@
                                         <input class="form-control border-0 px-8 min-h-45px" name="approval_hash" id="approval_hash" type="hidden"/>                                        
                                     </div>
                                     <!--end::Hash--> 
+                                    <div id="filesAdded" class="d-none">
+
+                                    </div>
                                     <!--begin::Subject-->
                                     <div class="border-bottom">
                                         <input class="form-control border-0 px-8 min-h-45px" name="compose_subject" placeholder="Subject" />
@@ -40,18 +42,18 @@
                                         <div class="mr-2 pt-1">
                                             <div class="radio-inline">
                                                 <label class="radio radio-success">
-                                                <input type="radio" name="approval_action_new" checked="checked" value="Approval">
+                                                <input type="radio" name="approval_action_new" id="action_request_approval" checked="checked" value="Approval">
                                                 <span></span>Approval</label>
                                                 <label class="radio radio-success">
-                                                <input type="radio" name="approval_action_new" value="Concent">
+                                                <input type="radio" name="approval_action_new" id="action_request_concent" value="Concent">
                                                 <span></span>Concent</label>
                                                 <label class="radio radio-success">
-                                                <input type="radio" name="approval_action_new" value="Notification">
+                                                <input type="radio" name="approval_action_new" id="action_request_notification" value="Notification">
                                                 <span></span>Notification</label>
                                             </div>
                                         </div>
                                         <div class="d-flex align-items-center flex-grow-1 typeahead ">                                            
-                                            <input id="approval_user_new" class="form-control border-0 px-0 min-h-45px ml-2"  name="compose_subject" placeholder="Search for user to add into the approval path" />                                            
+                                            <input id="approval_user_new" class="form-control border-0 px-0 min-h-45px ml-2" placeholder="Search for user to add into the approval path" />                                            
                                         </div>                                        
                                     </div>
                                     <!--end::Add User-->
@@ -67,80 +69,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>                                                
-                                                <!--
-                                                <tr>
-                                                    <td scope="row" class="pl-8" style="width:350px;">
-                                                        <div class="radio-inline">
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5" checked="checked">
-                                                            <span></span>Approval</label>
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5">
-                                                            <span></span>Concent</label>
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5">
-                                                            <span></span>Notification</label>
-                                                        </div>
-                                                    </td>
-                                                    <td>Jonathan Araiza (j.araiza)</td>
-                                                    <td>Sr. App Developer</td>
-                                                    <td>
-                                                        <a href="#">
-                                                        <span class="label label-inline label-light-danger font-weight-bold">
-                                                            Remove
-                                                        </span>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td scope="row" class="pl-8">
-                                                        <div class="radio-inline">
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5" checked="checked">
-                                                            <span></span>Approval</label>
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5">
-                                                            <span></span>Concent</label>
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5">
-                                                            <span></span>Notification</label>
-                                                        </div>
-                                                    </td>
-                                                    <td>Jonathan Araiza (j.araiza)</td>
-                                                    <td>Production Manager</td>
-                                                    <td>
-                                                        <a href="#">
-                                                        <span class="label label-inline label-light-danger font-weight-bold">
-                                                            Remove
-                                                        </span>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td scope="row"  class="pl-8">
-                                                        <div class="radio-inline">
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5" checked="checked">
-                                                            <span></span>Approval</label>
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5">
-                                                            <span></span>Concent</label>
-                                                            <label class="radio radio-success">
-                                                            <input type="radio" name="radios5">
-                                                            <span></span>Notification</label>
-                                                        </div>
-                                                    </td>
-                                                    <td>Jonathan Araiza (j.araiza)</td>
-                                                    <td>Quality Manager</td>
-                                                    <td>
-                                                        <a href="#">
-                                                        <span class="label label-inline label-light-danger font-weight-bold">
-                                                            Remove
-                                                        </span>
-                                                        </a>
-                                                    </td>
-                                                </tr> 
-                                                -->                                                                                               
+                                                
                                             </tbody>
                                         </table>
                                     </div>
@@ -182,7 +111,7 @@
                                     <div class="d-flex align-items-center mr-3">
                                         <!--begin::Send-->
                                         <div class="btn-group mr-4">
-                                            <span class="btn btn-primary font-weight-bold px-6">Send</span>
+                                            <span class="btn btn-primary font-weight-bold px-6" id="btnSend">Send</span>
                                         </div>
                                         <!--end::Send-->
                                         <!--begin::Other-->
@@ -191,14 +120,7 @@
                                         </span>                                        
                                         <!--end::Other-->
                                     </div>
-                                    <!--end::Actions-->
-                                    <!--begin::Toolbar-->
-                                    <div class="d-flex align-items-center">                                        
-                                        <span class="btn btn-icon btn-sm btn-clean" data-inbox="dismiss" data-toggle="tooltip" title="Dismiss reply">
-                                            <i class="flaticon2-rubbish-bin-delete-button"></i>
-                                        </span>
-                                    </div>
-                                    <!--end::Toolbar-->
+                                    <!--end::Actions-->                                    
                                 </div>
                                 <!--end::Footer-->
                             </form>
@@ -206,7 +128,6 @@
                         </div>
                         <!--end::Body-->
                     </div>
-                    <!--end::Card-->
-                    </form>
+                    <!--end::Card-->                    
                 </div>                
                 <!--end::New-->

@@ -10,6 +10,7 @@ var KTAppInbox = function() {
     var _toolbarEl;    
     var _asideOffcanvas;
     var _approval_hash_new;
+    var _approval_editor_new;
 
     // Private methods
     var _initEditor = function(form, editor) {
@@ -23,7 +24,7 @@ var KTAppInbox = function() {
         };
 
         // Init editor
-        var editor = new Quill('#' + editor, options);
+        _approval_editor_new = new Quill('#' + editor, options);
 
         // Customize editor
         var toolbar = KTUtil.find(form, '.ql-toolbar');
@@ -342,9 +343,9 @@ var KTAppInbox = function() {
         previewNode.remove();
 
         var myDropzone = new Dropzone(id, { // Make the whole body a dropzone
-            url: "https://keenthemes.com/scripts/void.php", // Set the url for your upload script location
-            parallelUploads: 20,
-            maxFilesize: 1, // Max filesize in MB
+            url: BASE_URL + '/Approvals/FileUpload', // Set the url for your upload script location
+            parallelUploads: 3,
+            maxFilesize: 3, // Max filesize in MB
             previewTemplate: previewTemplate,
             previewsContainer: id + " .dropzone-items", // Define the container to display the previews
             clickable: id + "_select" // Define the element that should be used as click trigger to select files.
@@ -357,12 +358,52 @@ var KTAppInbox = function() {
 
         // Update the total progress bar
         myDropzone.on("totaluploadprogress", function(progress) {
-            document.querySelector(id + " .progress-bar").style.width = progress + "%";
+            try {
+                document.querySelector(id + " .progress-bar").style.width = progress + "%";    
+            } catch (error) {
+                
+            }            
         });
 
-        myDropzone.on("sending", function(file) {
+        myDropzone.on("sending", function(file, xhr, formData) {
+            console.log("sending");
+            console.log(file);
             // Show the total progress bar when upload starts
             document.querySelector(id + " .progress-bar").style.opacity = "1";
+            formData.append("approval_hash", _approval_hash_new);
+        });
+
+        myDropzone.on("removedfile", function(file, xhr, formData) {
+            console.log("removedfile");
+            if(file.status=="success"){
+                //Remover del servidor
+                $.ajax({
+                    url: BASE_URL + "/Approvals/RemoveFile",
+                    dataType: "json",
+                    method: "post",
+                    data: {
+                        file_name: file.name,
+                        approval_hash: _approval_hash_new
+                    },
+                    success: function(data){
+                        loading.hide();
+        
+                        console.log(data);
+        
+                        if(data.error==1){
+                            alert('Error creating a approval');
+                            return;
+                        }
+                        _approval_hash_new = data.approval_hash;
+                        $("#kt_inbox_new #approval_hash").val(data.approval_hash);
+                        
+                        //Mostrar new
+        
+                        KTUtil.addClass(_newEl, 'd-block');
+                        KTUtil.removeClass(_newEl, 'd-none');
+                    }            
+                });
+            }
         });
 
         // Hide the total progress bar when nothing's uploading anymore
@@ -370,7 +411,12 @@ var KTAppInbox = function() {
             var thisProgressBar = id + " .dz-complete";
             setTimeout(function() {
                 $(thisProgressBar + " .progress-bar, " + thisProgressBar + " .progress").css('opacity', '0');
-            }, 300)
+            }, 300);
+
+            if(progress.status=="success"){
+                var responseObj = JSON.parse(progress.xhr.responseText);
+                console.log(responseObj);                
+            }
         });
     }
 
@@ -385,6 +431,100 @@ var KTAppInbox = function() {
         KTUtil.addClass(_newEl, 'd-none');
     }
 
+    var _showSent = function(){
+
+        console.log("_showSent");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar lista
+        KTUtil.addClass(_newEl, 'd-none');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+
+        //Default Sent List
+        $.ajax({
+            url: BASE_URL + "/Approvals/GetApprovals",
+            dataType: "json",
+            data: {
+                "page" : 1,
+                "condition" : "sent",
+                "sort": "desc",
+            },
+            success: function(data){
+                loading.hide();
+
+                console.log(data);
+
+                if(data.error==1){
+                    alert(data.message);
+                    return;
+                }
+
+                $.each(data.rows, function(index,row){
+                    console.log(row);
+                    
+                    $("#approval_list_table").append('\
+                    <!--begin::Item-->\
+                    <div class="d-flex align-items-start list-item card-spacer-x py-3" data-inbox="message">\
+                        <!--begin::Author-->\
+                        <div class="d-flex align-items-center w-xxl-250px">\
+                            <span class="symbol symbol-35 mr-3 mt-1">\
+                                <span class="symbol-label" style="background-image: url(\'http://localhost/assets/media/users/100_13.jpg\')"></span>\
+                            </span>\
+                            <div class="d-flex flex-column flex-grow-1 flex-wrap mr-2">\
+                                <div class="d-flex">\
+                                    <a href="javascript:;" class="font-size-lg font-weight-bolder text-dark-75 text-hover-primary mr-2">' + row.first_name + ' ' + row.last_name + '</a>\
+                                </div>\
+                                <div class="d-flex flex-column">\
+                                    <div class="toggle-off-item">\
+                                        <span class="font-weight-bold text-muted cursor-pointer" data-toggle="dropdown">' + row.job_description + '\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </div>\
+                        <!--end::Author-->\
+                        <!--begin::Info-->\
+                        <div class="flex-grow-1 mt-2 mr-2" data-toggle="view">\
+                            <div>\
+                                <span class="font-weight-bolder font-size-lg mr-2">' + row.subject + '</span>\
+                            </div>\
+                        </div>\
+                        <!--end::Info-->\
+                        <!--begin::Datetime-->\
+                        <div class="mt-2 mr-3 font-weight-bolder w-100px text-right" data-toggle="view">\
+                            <span class="label label-light-primary font-weight-bold label-inline">' + row.status + '</span>\
+                        </div>\
+                        <!--end::Datetime-->\
+                        <!--begin::Datetime-->\
+                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right" data-toggle="view">' + row.submit_at_str + '</div>\
+                        <!--end::Datetime-->\
+                    </div>\
+                    <!--end::Item-->\
+                    ');
+                });
+
+
+                //Mostrar new
+                KTUtil.addClass(_listEl, 'd-block');
+                KTUtil.removeClass(_listEl, 'd-none');
+
+                console.log("x");
+            }            
+        });
+
+        
+    }
+    
     var _startNew = function(){
 
         console.log("_startNew");
@@ -406,8 +546,10 @@ var KTAppInbox = function() {
         KTUtil.removeClass(_viewEl, 'd-block');
 
         $('#approval_new_form').trigger("reset");
-        var editor = new Quill('#kt_inbox_new_editor');
-        editor.setText('');
+        
+        //var editor = new Quill('#kt_inbox_new_editor');
+        _approval_editor_new.setText('');
+        
 
         $("#approval_path_new tbody").html('<tr><td colspan="4" class="pl-8 text-center">Approval path is empty, select action and add a user</td></tr>');
 
@@ -436,41 +578,139 @@ var KTAppInbox = function() {
         
     }
 
-    var _addUser = function(new_user_name){
+    var _addToPath = function(new_user_name){        
         $.ajax({
             url: BASE_URL + "/Approvals/AddToPath",
-            data: { user_name: new_user_name, approval_hash: _approval_hash_new},
+            data: { 
+                user_name: new_user_name, 
+                approval_hash: _approval_hash_new,
+                approval_type: $("input[name='approval_action_new']:checked").val(),
+            },
             dataType: "json",
             success: function(data){                
                 console.log(data);
                 
                 if(data.error==1){
-                    alert('Error getting approval path');
+                    alert(data.message);
                     return;
                 }                
                 
-                _drawApprovalPath();
+                _previewPath();
             }            
         });
     }
 
-    var _drawApprovalPath = function(){
+    var _updateActionRequest= function(seq,action){
         $.ajax({
-            url: BASE_URL + "/Approvals/GetPath",
+            url: BASE_URL + "/Approvals/UpdateActionRequest",            
+            data: { 
+                approval_hash: _approval_hash_new,
+                approval_type: action,
+                seq: seq,
+            },
+            dataType: "json",
+            method: "post",
+            success: function(data){                
+                console.log(data);
+                
+                if(data.error==1){
+                    alert(data.message);
+                    return;
+                }
+            }
+        });
+    }
+    
+    var _removeFromPath= function(seq){
+        $.ajax({
+            url: BASE_URL + "/Approvals/RemoveFromPath",            
+            data: { 
+                approval_hash: _approval_hash_new,                
+                seq: seq,
+            },
+            dataType: "json",
+            method: "post",
+            success: function(data){                
+                console.log(data);
+                
+                if(data.error==1){
+                    alert(data.message);
+                    return;
+                }
+
+                _previewPath();
+            }
+        });
+    }
+
+    var _previewPath = function(){
+        $.ajax({
+            url: BASE_URL + "/Approvals/PreviewPath",            
             data: { approval_hash: _approval_hash_new},
             dataType: "json",
+            method: "post",
             success: function(data){                
                 console.log(data);
                 
                 if(data.error==1){
-                    alert('Error getting approval path');
+                    alert(data.message);
                     return;
-                }                
-            }            
+                }
+
+                if(data.steps_count==0){
+                    $("#approval_path_new tbody").html('<tr><td colspan="4" class="pl-8 text-center">Approval path is empty, select action and add a user</td></tr>');
+                    return;
+                }
+
+                $("#approval_path_new tbody").html('');
+                $.each(data.steps, function(index,step){
+                    console.log(step);
+                    
+                    $("#approval_path_new tbody").append('\
+                    <tr data-seq="' + step.seq + '" data-user-name="' + step.user_name + '">\
+                        <td scope="row" class="pl-8" style="width:350px;">\
+                            <div class="radio-inline">\
+                                <label class="radio radio-success">\
+                                <input type="radio" value="Approval" name="action_request_'+ step.seq + '" ' + ( step.approval_type=='Approval' ? 'checked="checked"' : '') + '>\
+                                <span></span>Approval</label>\
+                                <label class="radio radio-success">\
+                                <input type="radio" value="Concent" name="action_request_'+ step.seq + '" ' + ( step.approval_type=='Concent' ? 'checked="checked"' : '') + '>\
+                                <span></span>Concent</label>\
+                                <label class="radio radio-success">\
+                                <input type="radio" value="Notification" name="action_request_'+ step.seq + '" ' + ( step.approval_type=='Notification' ? 'checked="checked"' : '') + '>\
+                                <span></span>Notification</label>\
+                            </div>\
+                        </td>\
+                        <td>' + step.first_name + ' ' + step.last_name +' (' + step.user_name + ')</td>\
+                        <td>' + step.job_description + '</td>\
+                        <td>\
+                            <a href="javascript:;" class="label-remove">\
+                            <span class="label label-inline label-light-danger font-weight-bold">\
+                                Remove\
+                            </span>\
+                            </a>\
+                        </td>\
+                    </tr>\
+                    ');
+                });
+
+                $("#approval_path_new input[type='radio']").click(function(){
+                    var tr = $(this).closest('tr');
+                    var seq = tr.data("seq");
+                    var value = $(this).val();
+                    _updateActionRequest(seq,value);
+                });
+
+                $("#approval_path_new .label-remove").click(function(){
+                    var tr = $(this).closest('tr');
+                    var seq = tr.data("seq");                    
+                    _removeFromPath(seq);
+                });
+                
+            }
         });
     }
-
-    
+   
 
     // Public methods
     return {
@@ -497,6 +737,10 @@ var KTAppInbox = function() {
 
             if(DEFAULT_ACTION=="new"){
                 _startNew();
+            }
+
+            if(DEFAULT_ACTION=="sent"){
+                _showSent();
             }
             
         },
@@ -670,7 +914,55 @@ var KTAppInbox = function() {
                 }, 700);
             });
 
-            //'https://preview.keenthemes.com/metronic/theme/html/tools/preview/api/?file=typeahead/movies.json'
+            $('#btnSend').click(function(){
+
+                var formData = new FormData(document.getElementById("approval_new_form"));
+                
+                formData.append("messageBody",_approval_editor_new.root.innerHTML);
+                formData.append("messageText",_approval_editor_new.getText());
+
+                $.ajax({
+                    url: BASE_URL + "/Approvals/Send",
+                    method: "post",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,                    
+                }).done(function(res){
+                    console.log(res);
+
+                    if(res.error>0){
+                        swal.fire({
+                            html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        }).then(function() {
+                            KTUtil.scrollTop();
+                        });
+                        return;
+                    } else {
+                        swal.fire({
+                            text: res.message,
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        }).then(function() {
+                            KTUtil.scrollTop();
+                            //Go to Sent List
+                        });
+                        return;
+                    }
+
+                });
+            });
+
             var usersList = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('user_name'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -696,7 +988,8 @@ var KTAppInbox = function() {
             });
 
             $('#approval_user_new').bind('typeahead:select', function(ev, suggestion) {                
-                _addUser(suggestion.user_name);
+                _addToPath(suggestion.user_name);
+                $('#approval_user_new').typeahead('val','');
             });
 
             // Expand/Collapse reply
@@ -727,7 +1020,7 @@ var KTAppInbox = function() {
             });
             */
 
-            _initEditor(_newEl, 'kt_inbox_new_editor');            
+            _initEditor(_newEl, 'kt_inbox_new_editor');
             _initAttachments('kt_inbox_new_attachments');            
         },
     };

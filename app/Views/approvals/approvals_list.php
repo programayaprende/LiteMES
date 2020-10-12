@@ -6,35 +6,11 @@
             <div class="card-header row row-marginless align-items-center flex-wrap py-5 h-auto">
                 <!--begin::Toolbar-->
                 <div class="col-12 col-sm-6 col-xxl-4 order-2 order-xxl-1 d-flex flex-wrap align-items-center">
-                    <div class="d-flex align-items-center mr-1 my-2">
-                        <div class="dropdown">
-                            <span class="btn btn-clean btn-icon btn-sm mr-1" data-toggle="dropdown">
-                                <i class="ki ki-bold-arrow-down icon-sm"></i>
-                            </span>
-                            <div class="dropdown-menu dropdown-menu-left p-0 m-0 dropdown-menu-sm">
-                                <ul class="navi py-3">
-                                    <li class="navi-item">
-                                        <a href="#" class="navi-link">
-                                            <span class="navi-text">All</span>
-                                        </a>
-                                    </li>
-                                    <li class="navi-item">
-                                        <a href="#" class="navi-link">
-                                            <span class="navi-text">Read</span>
-                                        </a>
-                                    </li>
-                                    <li class="navi-item">
-                                        <a href="#" class="navi-link">
-                                            <span class="navi-text">Unread</span>
-                                        </a>
-                                    </li>                                    
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="d-flex align-items-center mr-1 my-2">                        
                         <span class="btn btn-clean btn-icon btn-sm mr-2" data-toggle="tooltip" title="Reload list">
                             <i class="ki ki-refresh icon-1x"></i>
                         </span>
-                    </div>                                
+                    </div>
                 </div>
                 <!--end::Toolbar-->
                 <!--begin::Search-->
@@ -102,9 +78,9 @@
             <!--begin::Body-->
             <div class="card-body table-responsive px-0">
                 <!--begin::Items-->
-                <div class="list list-hover min-w-500px" data-inbox="list">                    
+                <div class="list list-hover min-w-500px" data-inbox="list" id="approval_list_table">                    
                     <?php
-                    for($c=0;$c<15;$c++){
+                    for($c=0;$c<0;$c++){
                     ?>
                     <!--begin::Item-->
                     <div class="d-flex align-items-start list-item card-spacer-x py-3" data-inbox="message">
