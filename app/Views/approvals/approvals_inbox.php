@@ -1,3 +1,48 @@
+<!--begin:Modal-->
+<div class="modal fade" id="actionModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdrop" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <form id="actionForm">
+                    
+                    <div class="form-group mb-8">
+                        <div class="alert alert-custom alert-default" role="alert">
+                            <div class="alert-icon"><i class="flaticon-warning text-primary"></i></div>
+                            <div class="alert-text">
+                            In case of reject, please input a remark for you decision
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Action <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control"  placeholder="Action" name="approval_step_action" readonly/>                        
+                    </div>
+                    
+                    <div class="form-group mb-1">
+                        <label for="exampleTextarea">Remark <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="exampleTextarea" rows="3" name="approval_step_remark"></textarea>
+                    </div>
+                    
+                    
+                </form>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary font-weight-bold">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end:Modal-->
 <!--begin::Content-->
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
     <!--begin::Subheader-->
@@ -30,7 +75,7 @@
     <!--begin::Entry-->
     <div class="d-flex flex-column-fluid">
         <!--begin::Container-->
-        <div class="container">
+        <div class="container-fluid">
             <!--begin::Inbox-->
             <div class="d-flex flex-row">
                 <!--begin::Aside-->

@@ -76,53 +76,63 @@
             </div>
             <!--end::Header-->
             <!--begin::Body-->
-            <div class="card-body table-responsive px-0">
+            <div class="card-body table-responsive">
+                <!--begin: Datatable-->
+                <table class="table table-hover" id="kt_datatable" style="">
+                    <thead>
+                        <tr>
+                            <th>Sender</th>
+                            <th>Subject</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+                <!--end: Datatable-->
+                <?
+                if(false){
+                ?>
                 <!--begin::Items-->
-                <div class="list list-hover min-w-500px" data-inbox="list" id="approval_list_table">                    
+                <div class="d-none list list-hover min-w-500px" data-inbox="list" id="approval_list_table">                                        
                     <?php
-                    for($c=0;$c<0;$c++){
+                    for($c=0;$c<10;$c++){
                     ?>
-                    <!--begin::Item-->
                     <div class="d-flex align-items-start list-item card-spacer-x py-3" data-inbox="message">
-                        <!--begin::Author-->
-                        <div class="d-flex align-items-center w-xxl-250px">
-                            <span class="symbol symbol-35 mr-3 mt-1">
-                                <span class="symbol-label" style="background-image: url('<?=base_url()?>/assets/media/users/100_13.jpg')"></span>
-                            </span>
-                            <div class="d-flex flex-column flex-grow-1 flex-wrap mr-2">
-                                <div class="d-flex">
-                                    <a href="#" class="font-size-lg font-weight-bolder text-dark-75 text-hover-primary mr-2">Chris Muller</a>                                    
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <div class="toggle-off-item">
-                                        <span class="font-weight-bold text-muted cursor-pointer" data-toggle="dropdown">Sr. App Developer                                        
-                                    </div>                                    
-                                </div>
+                        <!--begin::Toolbar-->
+                        <div class="d-flex align-items-center">                            
+                            <!--begin::Author-->
+                            <div class="d-flex align-items-center flex-wrap w-xxl-200px mr-3 mt-2">
+                                Jonathan Araizax <br>
+                                App Developer
                             </div>
+                            <!--end::Author-->
                         </div>
-                        <!--end::Author-->
+                        <!--end::Toolbar-->
                         <!--begin::Info-->
-                        <div class="flex-grow-1 mt-2 mr-2" data-toggle="view">
+                        <div class="flex-grow-1 mt-2 mr-2">
                             <div>
-                                <span class="font-weight-bolder font-size-lg mr-2">Digital PPV Customer Confirmation </span>
-                            </div>                                 
+                                <span class="font-weight-bolder font-size-lg mr-2">Digital PPV Customer Confirmation - Customer Confirmation </span>
+                            </div>                            
                         </div>
                         <!--end::Info-->
-                        <!--begin::Datetime-->
-                        <div class="mt-2 mr-3 font-weight-bolder w-100px text-right" data-toggle="view">
-                            <span class="label label-light-primary font-weight-bold label-inline">Pending</span>
+                        <!--begin::Status-->
+                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right">
+                            <span class="label label-light-primary font-weight-bold label-inline mr-1">Pending</span>
                         </div>
-                        <!--end::Datetime-->
+                        <!--end::Status-->
                         <!--begin::Datetime-->
-                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right" data-toggle="view">Jul 15, 2019, 11:19AM</div>
+                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right">8:30 PM</div>
                         <!--end::Datetime-->
                     </div>
-                    <!--end::Item-->
                     <?php
                     }
                     ?>                    
                 </div>
                 <!--end::Items-->
+                <?
+                }
+                ?>
             </div>
             <!--end::Body-->
         </div>

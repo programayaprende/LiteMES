@@ -253,7 +253,7 @@ var KTDatatablesDataSourceAjaxClient = function() {
 }();
 
 function reload_users_table(){
-    
+    //console.log(dataUsers);
     var table = $('#kt_datatable').DataTable();
     table.destroy();    
     KTDatatablesDataSourceAjaxClient.init();

@@ -1,5 +1,8 @@
 "use strict";
 
+var dataUsers = null;
+var dataTable;
+
 // Class definition
 var KTAppInbox = function() {
     // Private properties
@@ -443,86 +446,52 @@ var KTAppInbox = function() {
         });
         loading.show();
 
-        //Ocultar lista
+        //Ocultar new
         KTUtil.addClass(_newEl, 'd-none');
         KTUtil.removeClass(_newEl, 'd-block');
 
         //Ocultar view
         KTUtil.addClass(_viewEl, 'd-none');
         KTUtil.removeClass(_viewEl, 'd-block');
-
-        //Default Sent List
+        
         $.ajax({
-            url: BASE_URL + "/Approvals/GetApprovals",
-            dataType: "json",
-            data: {
-                "page" : 1,
-                "condition" : "sent",
-                "sort": "desc",
-            },
-            success: function(data){
+            url: BASE_URL + '/Approvals/GetApprovals/Sent',
+            type: "post",
+            dataType: "json"
+        })
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
+            if(res.error>0){
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });                              
+            } else {                 
+                //$("#main_subtitle").html(res.role_data.name);
+                //$("#name").val(res.role_data.name);
+                //$("#description").val(res.role_data.description);
+                //$("#id").val(res.role_data.id);
+                
                 loading.hide();
-
-                console.log(data);
-
-                if(data.error==1){
-                    alert(data.message);
-                    return;
-                }
-
-                $.each(data.rows, function(index,row){
-                    console.log(row);
-                    
-                    $("#approval_list_table").append('\
-                    <!--begin::Item-->\
-                    <div class="d-flex align-items-start list-item card-spacer-x py-3" data-inbox="message">\
-                        <!--begin::Author-->\
-                        <div class="d-flex align-items-center w-xxl-250px">\
-                            <span class="symbol symbol-35 mr-3 mt-1">\
-                                <span class="symbol-label" style="background-image: url(\'http://localhost/assets/media/users/100_13.jpg\')"></span>\
-                            </span>\
-                            <div class="d-flex flex-column flex-grow-1 flex-wrap mr-2">\
-                                <div class="d-flex">\
-                                    <a href="javascript:;" class="font-size-lg font-weight-bolder text-dark-75 text-hover-primary mr-2">' + row.first_name + ' ' + row.last_name + '</a>\
-                                </div>\
-                                <div class="d-flex flex-column">\
-                                    <div class="toggle-off-item">\
-                                        <span class="font-weight-bold text-muted cursor-pointer" data-toggle="dropdown">' + row.job_description + '\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </div>\
-                        <!--end::Author-->\
-                        <!--begin::Info-->\
-                        <div class="flex-grow-1 mt-2 mr-2" data-toggle="view">\
-                            <div>\
-                                <span class="font-weight-bolder font-size-lg mr-2">' + row.subject + '</span>\
-                            </div>\
-                        </div>\
-                        <!--end::Info-->\
-                        <!--begin::Datetime-->\
-                        <div class="mt-2 mr-3 font-weight-bolder w-100px text-right" data-toggle="view">\
-                            <span class="label label-light-primary font-weight-bold label-inline">' + row.status + '</span>\
-                        </div>\
-                        <!--end::Datetime-->\
-                        <!--begin::Datetime-->\
-                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right" data-toggle="view">' + row.submit_at_str + '</div>\
-                        <!--end::Datetime-->\
-                    </div>\
-                    <!--end::Item-->\
-                    ');
-                });
-
-
-                //Mostrar new
+        
+                //Mostrar listado
                 KTUtil.addClass(_listEl, 'd-block');
                 KTUtil.removeClass(_listEl, 'd-none');
 
                 console.log("x");
-            }            
-        });
-
-        
+                
+                dataUsers = res.data;
+                reload_table();
+            }
+        });        
     }
     
     var _startNew = function(){
@@ -533,7 +502,7 @@ var KTAppInbox = function() {
         var loading = new KTDialog({
             'type': 'loader',
             'placement': 'top center',
-            'message': 'Loading ...'
+            'message': 'Loadingq ...'
         });
         loading.show();
 
@@ -745,6 +714,112 @@ var KTAppInbox = function() {
             
         },
 
+        viewApproval: function(approval_hash) {
+            // Demo loading
+            var loading = new KTDialog({
+                'type': 'loader',
+                'placement': 'top center',
+                'message': 'Loading ' + approval_hash
+            });
+            loading.show();
+
+            $.ajax({
+                url: BASE_URL + "/Approvals/View/" + approval_hash,
+                dataType: "json",
+                success: function(data){
+                    loading.hide();
+    
+                    console.log(data);
+    
+                    if(data.error==1){
+                        alert('Error getting approval data');
+                        return;
+                    }
+
+                    $("#view_subject").html(data.approval.subject);
+
+                    $("#view_approval_path").html("");
+                    
+                    $.each(data.approval_path, function(index,approval_step){
+                        $("#view_approval_path").append(
+                            '\
+                            <div class=" shadow-xs toggle-off" data-inbox="message">\
+                                <div class="d-flex align-items-center card-spacer-x py-6">\
+                                    <span class="symbol symbol-50 mr-4">\
+                                        <span class="symbol-label" style="background-image: url(\'' + BASE_URL + '/assets/media/users/100_11.jpg\')"></span>\
+                                    </span>\
+                                    <div class="d-flex flex-column flex-grow-1 flex-wrap mr-2">\
+                                        <div class="d-flex">\
+                                            <a href="javascript:;" class="font-size-lg font-weight-bolder text-dark-75 text-hover-primary mr-2">' + approval_step.first_name + ' ' + approval_step.last_name + '</a>\
+                                            <div class="font-weight-bold text-muted">\
+                                            | ' + approval_step.job_description + '</div>\
+                                        </div>\
+                                        <div class="d-flex flex-column">\
+                                            <div class="text-muted font-weight-bold toggle-on-item">' + approval_step.comment + '</div>\
+                                        </div>\
+                                    </div>\
+                                    <div class="d-flex align-items-center">\
+                                        <div class="font-weight-bold text-muted mr-2" >' + approval_step.status_set_at + '</div>\
+                                        <div class="d-flex align-items-center">\
+                                            <span class="label label-light-primary font-weight-bold label-inline mr-1">' + approval_step.status + '</span>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                            '
+                        );
+                    });
+
+                    $("#view_drafter").html(data.approval.first_name + ' ' + data.approval.last_name);
+                    $("#view_drafter_job_description").html(data.approval.job_description);
+                    $("#view_submit_at").html(data.approval.submit_at);
+                    $("#view_body").html(data.approval.body);
+
+                    $("#view_files").html("");
+                    $.each(data.approval_files, function(index,approval_file){                        
+                        $("#view_files").append('\
+                        <a href="javascript:;" class="d-flex align-items-center text-muted text-hover-primary py-1">\
+                        <span class="flaticon2-clip-symbol text-warning icon-1x mr-2"></span>' + approval_file.file_name + '</a>\
+                        ');
+                    });
+
+                    $("#btn-approve").addClass("d-none");
+                    $("#btn-reject").addClass("d-none");
+
+                    if(data.show_btn){
+                        $("#btn-approve").removeClass("d-none");
+                        $("#btn-reject").removeClass("d-none");
+                    }
+                    
+                    //Ocultar listas
+                    KTUtil.addClass(_listEl, 'd-none');
+                    KTUtil.removeClass(_listEl, 'd-block');
+
+                    //Ocultar new
+                    KTUtil.addClass(_newEl, 'd-none');
+                    KTUtil.removeClass(_newEl, 'd-block');
+                    
+                    //Mostrar vista
+                    KTUtil.addClass(_viewEl, 'd-block');
+                    KTUtil.removeClass(_viewEl, 'd-none');
+                },
+                error: function() {
+                    alert('Error');
+                },
+                complete: function(){
+                    loading.hide();
+                }
+            });
+
+
+            return;
+            setTimeout(function() {
+                loading.hide();
+                
+
+            }, 700);
+        },
+
         initAside: function() {
             // Mobile offcanvas for mobile mode
             _asideOffcanvas = new KTOffcanvas(_asideEl, {
@@ -765,7 +840,7 @@ var KTAppInbox = function() {
                 var loading = new KTDialog({
                     'type': 'loader',
                     'placement': 'top center',
-                    'message': 'Loading ...'
+                    'message': 'Loadingg ...'
                 });
                 loading.show();
 
@@ -784,71 +859,86 @@ var KTAppInbox = function() {
         },
 
         initList: function() {
-            // View message
-            KTUtil.on(_listEl, '[data-inbox="message"]', 'click', function(e) {
-                var actionsEl = KTUtil.find(this, '[data-inbox="actions"]');
 
-                // skip actions click
-                if (e.target === actionsEl || (actionsEl && actionsEl.contains(e.target) === true)) {
-                    return false;
-                }
+            console.log("initList");
 
-                // Demo loading
-                var loading = new KTDialog({
-                    'type': 'loader',
-                    'placement': 'top center',
-                    'message': 'Loading ...'
-                });
-                loading.show();
+            dataTable = $('#kt_datatable');
 
-                setTimeout(function() {
-                    loading.hide();
-
-                    KTUtil.addClass(_listEl, 'd-none');
-                    KTUtil.removeClass(_listEl, 'd-block');
-
-                    KTUtil.addClass(_viewEl, 'd-block');
-                    KTUtil.removeClass(_viewEl, 'd-none');
-                }, 700);
-            });
-
-            // Group selection
-            KTUtil.on(_listEl, '[data-inbox="group-select"] input', 'click', function() {
-                var messages = KTUtil.findAll(_listEl, '[data-inbox="message"]');
-
-                for (var i = 0, j = messages.length; i < j; i++) {
-                    var message = messages[i];
-                    var checkbox = KTUtil.find(message, '.checkbox input');
-                    checkbox.checked = this.checked;
-
-                    if (this.checked) {
-                        KTUtil.addClass(message, 'active');
-                    } else {
-                        KTUtil.removeClass(message, 'active');
-                    }
-                }
-            });
-
-            // Individual selection
-            KTUtil.on(_listEl, '[data-inbox="message"] [data-inbox="actions"] .checkbox input', 'click', function() {
-                var item = this.closest('[data-inbox="message"]');
-
-                if (item && this.checked) {
-                    KTUtil.addClass(item, 'active');
-                } else {
-                    KTUtil.removeClass(item, 'active');
-                }
+            // begin first table
+            dataTable.DataTable({
+                responsive: true,
+                data: dataUsers,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        title: 'Sender',                        
+                        render: function(data, type, full, meta) {                                                    
+                            
+                            var output = '<div class="d-flex align-items-center">\
+								<div class="symbol symbol-40 symbol-light-success flex-shrink-0">\
+									<span class="symbol-label font-size-h4 font-weight-bold">' + full[8].substring(0, 1) + '</span>\
+								</div>\
+								<div class="ml-4">\
+									<div class="text-dark-75 font-weight-bolder font-size-lg mb-0">' + full[8] + ' ' + full[9] + '</div>\
+									' + full[10] + '\
+								</div>\
+							</div>';
+                            
+                            return output;
+                        },
+                    },
+                    {
+                        targets: 1,                        
+                        render: function(data, type, full, meta) {                                                    
+                            return full[3];
+                        },
+                    },
+                    {
+                        targets: 2,
+                        render: function(data, type, full, meta) {                                                    
+                            return full[11];
+                        },
+                    },
+                    {
+                        targets: 3,
+                        render: function(data, type, full, meta) {                                                    
+                            return '\
+                            <span class="label label-light-primary font-weight-bold label-inline mr-1">' + full[2] + '</span>\
+                            ';                            
+                        },
+                    },
+                    {
+                        targets: -1,
+                        title: '',
+                        orderable: false,
+                        render: function(data, type, full, meta) {                                                    
+                            return '\
+                                <div class="d-flex align-items-center">\
+                                    <a href="javascript:KTAppInbox.viewApproval(\'' + full[7] + '\');" class="btn btn-sm btn-clean btn-icon" title="View">\
+                                        <i class="la la-eye"></i>\
+                                    </a>\
+                                </div>\
+                            ';
+                        },
+                    },
+                ],
             });
         },
 
         initView: function() {
+            
+            $("#btn-approve").click(function(){
+                console.log('Approve');
+                $("#actionModal").modal('show');
+            });
+            
             // Back to listing
             KTUtil.on(_viewEl, '[data-inbox="back"]', 'click', function() {
                 // demo loading
                 var loading = new KTDialog({
                     'type': 'loader',
                     'placement': 'top center',
-                    'message': 'Loading ...'
+                    'message': 'Loadingx ...'
                 });
 
                 loading.show();
@@ -866,6 +956,7 @@ var KTAppInbox = function() {
 
             // Expand/Collapse reply
             KTUtil.on(_viewEl, '[data-inbox="message"]', 'click', function(e) {
+                return;
                 var message = this.closest('[data-inbox="message"]');
 
                 var dropdownToggleEl = KTUtil.find(this, '[data-toggle="dropdown"]');
@@ -898,7 +989,7 @@ var KTAppInbox = function() {
                 var loading = new KTDialog({
                     'type': 'loader',
                     'placement': 'top center',
-                    'message': 'Loading ...'
+                    'message': 'Loadingxx ...'
                 });
 
                 loading.show();
@@ -992,39 +1083,17 @@ var KTAppInbox = function() {
                 $('#approval_user_new').typeahead('val','');
             });
 
-            // Expand/Collapse reply
-            /*
-            KTUtil.on(_newEl, '[data-inbox="message"]', 'click', function(e) {
-                var message = this.closest('[data-inbox="message"]');
-
-                var dropdownToggleEl = KTUtil.find(this, '[data-toggle="dropdown"]');
-                var toolbarEl = KTUtil.find(this, '[data-inbox="toolbar"]');
-
-                // skip dropdown toggle click
-                if (e.target === dropdownToggleEl || (dropdownToggleEl && dropdownToggleEl.contains(e.target) === true)) {
-                    return false;
-                }
-
-                // skip group actions click
-                if (e.target === toolbarEl || (toolbarEl && toolbarEl.contains(e.target) === true)) {
-                    return false;
-                }
-
-                if (KTUtil.hasClass(message, 'toggle-on')) {
-                    KTUtil.addClass(message, 'toggle-off');
-                    KTUtil.removeClass(message, 'toggle-on');
-                } else {
-                    KTUtil.removeClass(message, 'toggle-off');
-                    KTUtil.addClass(message, 'toggle-on');
-                }
-            });
-            */
-
             _initEditor(_newEl, 'kt_inbox_new_editor');
             _initAttachments('kt_inbox_new_attachments');            
         },
     };
 }();
+
+function reload_table(){
+    var table = $('#kt_datatable').DataTable();
+    table.destroy();    
+    KTAppInbox.initList();    
+}
 
 // Class Initialization
 jQuery(document).ready(function() {

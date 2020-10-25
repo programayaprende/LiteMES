@@ -27,7 +27,9 @@ class Approvals extends SecureController{
         //Informacion para el desplegado de la pagina
         $data['page_title']= "Approvals | Sent";
         $data['style_files'][] = '';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
         $data['js_files'][] = '<script> var DEFAULT_ACTION = "sent"; </script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
         $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/approvals/inbox.js"></script>';
         
         echo view("templates/header",$data);
@@ -40,20 +42,140 @@ class Approvals extends SecureController{
         return;
     }
 
-    public function GetApprovals(){
+    public function View($approval_hash){
         $db = db_connect();
+
+        $extra = [];
 
         $json['error'] = 0;
         $json['message'] = "";
 
+        try {   
+
+            $canView = false;
+
+            //Revisar que el approval exista y que no sea Draft
+            $select = "select a.* from md_approvals a
+            left join ma_users b on a.drafter = b.user_name
+            where approval_hash = ".$db->escape($approval_hash)." and status not in ('Draft')";
+            
+            $query = $db->query($select);
+
+            $approval = $query->getRowArray();
+
+            if(!isset($approval)){
+                $json['message'] = "Approval not found";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+            //Traer el approval_path
+            $select = "
+            select a.* from md_approvals_users a
+            left join ma_users b on a.user_name = b.user_name
+            where id_approval= ".$db->escape($approval['id_approval'])."
+            order by seq
+            ";
+
+            $query = $db->query($select);
+
+            $approval_path = [];
+
+            $next_user_name = "";
+
+            foreach($query->getResultArray() as $row){
+                if($row['status']=="-"){
+                    $row['comment'] = "-";
+                    $row['status'] = "Pending";
+                }
+                if($row['status_set_at']==""){
+                    $row['status_set_at']="-";
+                }
+                $approval_path[] = $row;
+                if($row['user_name']==session()->get('user_name')){
+                    $canView = true;
+                }
+
+                if($row['approval_type']=="Approval" && $row['status']=="Pending" && $next_user_name==""){
+                    $next_user_name = $row['user_name'];
+                }
+            }
+
+            $json['next_user_name'] = $next_user_name;
+
+            $json['show_btn'] = 0;
+
+            if($next_user_name == session()->get('user_name')){
+                $json['show_btn'] = 1;
+            }
+
+
+            //Revisar si soy el creador del Approval o soy parte de los usuarios
+            if(!$canView && $approval['drafter']!=session()->get('user_name')){
+                $json['message'] = "Approval not found";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+            //Traer la informacion de los archivos adjuntos
+            $select = "select * from md_approvals_files where id_approval = ".$db->escape($approval['id_approval'])." and upload_status='UPLOADED'";
+
+            $query = $db->query($select);
+
+            $approval_files = [];
+
+            foreach($query->getResultArray() as $row){
+                $approval_files[] = $row;
+            }
+            
+            $json['approval'] = $approval;
+            $json['approval_path'] = $approval_path;
+            $json['approval_files'] = $approval_files;
+            
+            return $this->respond($json, 200);
+
+        }catch(Exception $e){
+            $json['e'] = $e->getMessage();
+            $json['message'] = "Error getting approvals list";
+            $json['error']=1;
+            return $this->respond($json, 500);
+        }
+
+    }
+
+    public function GetApprovals($initFilter){
+        $db = db_connect();
+
+        $extra = [];
+        
+        //Datos enviados por DataTable
+        $datatable = array_merge(array('pagination' => array(), 'sort' => array(), 'query' => array()), $_REQUEST);
+
         $json['codition'] = $this->request->getVar('condition');
         $json['sort'] = $this->request->getVar('sort');
         
-
-        try {
+        try {   
 
             //Contruir el query
-            if($this->request->getVar('condition')=="sent"){                
+            if($this->request->getVar('condition')=="sent" || $initFilter=="Sent"){
+
+                //Revisar filtros extras
+                foreach($_REQUEST as $field=>$value){
+                    if(substr($field,0,7)!="filter_" or $value==""){
+                        continue;
+                    }
+                    switch($field){
+                        case "filter_name":
+                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
+                            $dataBuilder->where($condition);
+                            break;
+                    }
+                }
+
+                //Checar si se mando info para el sort
+                $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'desc';
+                $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'submit_at';
+
                 $select = "
                 select 
                     a.*,
@@ -64,37 +186,68 @@ class Approvals extends SecureController{
                 where 
                     drafter = ".$db->escape(session()->get('user_name'))." 
                     and status not in ('Draft')
-                order by submit_at ".$this->request->getVar("sort");
+                order by ".$field." ".$sort;
             }
 
-            $page = (!isset($_POST['page'])) ? 1 : $_POST['page'];
+            //Revisar que pagina quieren ver        
+            $page = !empty($datatable['pagination']['page']) ? (int)$datatable['pagination']['page'] : 1;
+            //Revisar cuantos items por pagina
+            $perpage = !empty($datatable['pagination']['perpage']) ? (int)$datatable['pagination']['perpage'] : -1;
 
-            $json['page'] = $page;
+            $pages = 1;
+            $total = 100;
 
-            $perPage = 50;
-
-            $offSet = 50 * ($page-1);
-
-            $select .= " limit $offSet, $perPage";
+            if ($perpage > 0) {
+                $pages = ceil($total / $perpage); // calculate total pages
+                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
+                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
+                $offset = ($page - 1) * $perpage;
+                if ($offset < 0) {
+                    $offset = 0;
+                }                                        
+                $select .= " limit $offset, $perpage";
+            }
             
             $query = $db->query($select);
 
-            $rows = [];
+            $data = [];
 
             foreach($query->getResultArray() as $row){
                 $row['submit_at_str'] = date("M d, Y h:i:s a",strtotime($row['submit_at']));
-                $rows[] = $row;                
+                $c=0;
+                $row_data = [];
+                foreach($row as $v){
+                    $row_data[$c] = $v;
+                    $c++;
+                }
+                $data[] = $row_data;
             }
 
-            $json['rows'] = $rows;
+            $meta = array(
+                'page' => $page,
+                'pages' => $pages,
+                'perpage' => $perpage,
+                'total' => $total,
+            );
 
-            return $this->respond($json, 200);
+            //$json['rows'] = $rows;
+
+            $result = array(
+                'meta' => $meta + array(
+                    'sort' => $sort,
+                    'field' => $field,
+                ),
+                'data' => $data
+            );
+            
+            echo json_encode($result, JSON_PRETTY_PRINT);
+
         }catch(Exception $e){
             $json['e'] = $e->getMessage();
             $json['message'] = "Error getting approvals list";
             $json['error']=1;
-            return $this->respond($json, 200);
-        }
+            return $this->respond($json, 500);
+        }        
     }
 
     public function UpdateActionRequest(){
