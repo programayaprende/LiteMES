@@ -502,7 +502,7 @@ var KTAppInbox = function() {
         var loading = new KTDialog({
             'type': 'loader',
             'placement': 'top center',
-            'message': 'Loadingq ...'
+            'message': 'Loading ...'
         });
         loading.show();
 
@@ -719,9 +719,24 @@ var KTAppInbox = function() {
             var loading = new KTDialog({
                 'type': 'loader',
                 'placement': 'top center',
-                'message': 'Loading ' + approval_hash
+                'message': 'Loading ...'
             });
             loading.show();
+            
+            $("#view_subject").html("");
+            $("#view_approval_path").html("");
+            $("#view_drafter").html("");
+            $("#view_drafter_job_description").html("");
+            $("#view_submit_at").html("");
+            $("#view_body").html("");
+            $("#view_files").html("");
+            $("#view_approval_hash").html("");
+
+            //Reset modal
+            $("#actionModalTitle").html("");
+            $("#approval_step_action").val("");
+            $("#approval_step_approval_hash").val("");
+            $("#approval_step_comment").val("");
 
             $.ajax({
                 url: BASE_URL + "/Approvals/View/" + approval_hash,
@@ -741,6 +756,24 @@ var KTAppInbox = function() {
                     $("#view_approval_path").html("");
                     
                     $.each(data.approval_path, function(index,approval_step){
+                        
+                        var state = "info";
+
+                        switch(approval_step.status){
+                            case "Pending":
+                                state = "primary";
+                                break;
+                            case "Approved":
+                                state = "success";
+                                break;
+                            case "Rejected":
+                                state = "danger";
+                                break;
+                            case "Notified":
+                                state = "warning";
+                                break;
+                        }
+
                         $("#view_approval_path").append(
                             '\
                             <div class=" shadow-xs toggle-off" data-inbox="message">\
@@ -761,7 +794,7 @@ var KTAppInbox = function() {
                                     <div class="d-flex align-items-center">\
                                         <div class="font-weight-bold text-muted mr-2" >' + approval_step.status_set_at + '</div>\
                                         <div class="d-flex align-items-center">\
-                                            <span class="label label-light-primary font-weight-bold label-inline mr-1">' + approval_step.status + '</span>\
+                                            <span class="label label-light-' + state + ' font-weight-bold label-inline mr-1">' + approval_step.status + '</span>\
                                         </div>\
                                     </div>\
                                 </div>\
@@ -774,6 +807,7 @@ var KTAppInbox = function() {
                     $("#view_drafter_job_description").html(data.approval.job_description);
                     $("#view_submit_at").html(data.approval.submit_at);
                     $("#view_body").html(data.approval.body);
+                    $("#view_approval_hash").html(data.approval.approval_hash);
 
                     $("#view_files").html("");
                     $.each(data.approval_files, function(index,approval_file){                        
@@ -927,9 +961,82 @@ var KTAppInbox = function() {
 
         initView: function() {
             
-            $("#btn-approve").click(function(){
-                console.log('Approve');
+            $("#btn-approve").click(function(){                
                 $("#actionModal").modal('show');
+                $("#actionModalTitle").html("Approve");
+                $("#approval_step_action").val("Approve");
+                $("#approval_step_approval_hash").val($("#view_approval_hash").html());                
+                $("#approval_step_comment").val("");
+                $("#btn-apply-action").removeClass("d-none");
+                $("#btn-apply-action-wait").addClass("d-none");
+            });
+
+            $("#btn-reject").click(function(){                
+                $("#actionModal").modal('show');
+                $("#actionModalTitle").html("Reject");
+                $("#approval_step_action").val("Reject");
+                $("#approval_step_approval_hash").val($("#view_approval_hash").html());
+                $("#approval_step_comment").val("");
+                $("#btn-apply-action").removeClass("d-none");
+                $("#btn-apply-action-wait").addClass("d-none");
+            });
+
+            $("#btn-apply-action").click(function(){
+                var formData = new FormData(document.getElementById("actionForm"));
+                
+                $("#btn-apply-action").addClass("d-none");
+                $("#btn-apply-action-wait").removeClass("d-none");
+
+                $.ajax({
+                    url: BASE_URL + "/Approvals/applyAction",
+                    method: "post",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(){
+                        alert('Error');
+                        $("#btn-apply-action").removeClass("d-none");
+                        $("#btn-apply-action-wait").addClass("d-none");
+                    }                    
+                }).done(function(res){
+                    
+                    console.log(res);
+
+                    if(res.error>0){
+                        swal.fire({
+                            html: res.message,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        }).then(function() {
+                            KTUtil.scrollTop();   
+                            $("#btn-apply-action").removeClass("d-none");
+                            $("#btn-apply-action-wait").addClass("d-none");
+                        });
+                        return;
+                    } else {
+                        swal.fire({
+                            text: res.message,
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        }).then(function() {
+                            $("#actionModal").modal('hide');
+                            KTUtil.scrollTop();
+                            //Refresh Approval
+                            KTAppInbox.viewApproval(res.approval.approval_hash);
+                        });
+                        return;
+                    }
+
+                });
             });
             
             // Back to listing
@@ -938,7 +1045,7 @@ var KTAppInbox = function() {
                 var loading = new KTDialog({
                     'type': 'loader',
                     'placement': 'top center',
-                    'message': 'Loadingx ...'
+                    'message': 'Loading ...'
                 });
 
                 loading.show();
@@ -989,7 +1096,7 @@ var KTAppInbox = function() {
                 var loading = new KTDialog({
                     'type': 'loader',
                     'placement': 'top center',
-                    'message': 'Loadingxx ...'
+                    'message': 'Loading ...'
                 });
 
                 loading.show();
@@ -1057,9 +1164,9 @@ var KTAppInbox = function() {
             var usersList = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('user_name'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: "http://localhost/Users/Search",
+                prefetch: BASE_URL + "/Users/Search",
                 remote: {
-                    url: 'http://localhost/Users/Search?condition=%QUERY',
+                    url: BASE_URL + '/Users/Search?condition=%QUERY',
                     wildcard: '%QUERY'
                 }
             });

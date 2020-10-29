@@ -3,7 +3,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
+                <h5 class="modal-title" id="actionModalTitle">-</h5> 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i aria-hidden="true" class="ki ki-close"></i>
                 </button>
@@ -11,7 +11,7 @@
             <div class="modal-body">
                 <!--begin::Form-->
                 <form id="actionForm">
-                    
+                    <input type="hidden" class="form-control" name="approval_step_approval_hash" id="approval_step_approval_hash" readonly/>
                     <div class="form-group mb-8">
                         <div class="alert alert-custom alert-default" role="alert">
                             <div class="alert-icon"><i class="flaticon-warning text-primary"></i></div>
@@ -23,13 +23,15 @@
                     
                     <div class="form-group">
                         <label>Action <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"  placeholder="Action" name="approval_step_action" readonly/>                        
+                        <input type="text" class="form-control"  placeholder="Action" name="approval_step_action" id="approval_step_action" readonly/>
                     </div>
                     
                     <div class="form-group mb-1">
-                        <label for="exampleTextarea">Remark <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="exampleTextarea" rows="3" name="approval_step_remark"></textarea>
+                        <label for="exampleTextarea">Comment <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="exampleTextarea" rows="3" name="approval_step_comment" id="approval_step_comment"></textarea>
                     </div>
+
+                    
                     
                     
                 </form>
@@ -37,7 +39,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary font-weight-bold">Apply</button>
+                <button type="button" class="btn btn-primary font-weight-bold" id="btn-apply-action" >Apply</button>
+                <button type="button" class="btn btn-primary font-weight-bold d-none" id="btn-apply-action-wait" >Please Wait</button>
             </div>
         </div>
     </div>

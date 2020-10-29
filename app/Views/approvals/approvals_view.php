@@ -8,7 +8,8 @@
                             <div class="d-flex align-items-center my-2 d-none">
                                 <!--<a href="#" class="btn btn-clean btn-icon btn-sm mr-6" data-inbox="back">
                                     <i class="flaticon2-left-arrow-1"></i>
-                                </a>-->                                                                
+                                </a>-->
+                                <div class="font-weight-bold text-muted">UID: <span id="view_approval_hash"></span></div>
                             </div>
                             <!--end::Left-->
                             <!--begin::Right-->
@@ -57,7 +58,7 @@
                             <div class="d-flex align-items-center justify-content-between flex-wrap card-spacer-x py-5">
                                 <!--begin::Title-->
                                 <div class="d-flex align-items-center mr-2 py-2">
-                                    <div class="font-weight-bold font-size-h3 mr-3" id="view_subject">...</div>                                    
+                                    <div class="font-weight-bold font-size-h3 mr-3" id="view_subject"></div>                                    
                                 </div>
                                 <!--end::Title-->                                
                             </div>
@@ -89,7 +90,6 @@
                                     <div class="card-spacer-x d-flex flex-column font-size-sm font-weight-bold pb-6" id="view_files">
                                         
                                     </div>
-
                                 </div>
                                                                 
                             </div>

@@ -42,6 +42,257 @@ class Approvals extends SecureController{
         return;
     }
 
+    public function testMail(){
+        echo "Test Mail";
+        return;
+
+        $to = 'jaraiza1983@gmail.com';
+        $subject = "Testing mail";
+        $message = "
+        <h1>Hola</h1>
+        <p>
+        Este es un ejemplo de correo ".date("YmdHis")."
+        </p>
+        ";
+
+        $email = \Config\Services::email();
+
+        $email->setFrom('programayaprende@gmail.com');
+        $email->setTo($to);
+        $email->setSubject($subject);
+        $email->setMessage($message);
+
+        if($email->send()){
+            echo "Correo enviado...";
+        } else {
+            $data = $email->printDebugger(['headers']);
+            print_r($data);
+        }
+    }
+
+    public function processApproval($approval_hash){
+        $db = db_connect();
+
+        try{
+            //Revisar que el approval exista y que no sea Draft
+            $select = "select a.* from md_approvals a
+            left join ma_users b on a.drafter = b.user_name
+            where approval_hash = ".$db->escape($this->request->getVar('approval_step_approval_hash'))." and status not in ('Draft')";
+
+            $query = $db->query($select);
+
+            $approval = $query->getRowArray();
+
+            if(!isset($approval)){                
+                return false;
+            }
+
+            //Traer el approval_path
+            $select = "
+            select a.* from md_approvals_users a
+            left join ma_users b on a.user_name = b.user_name
+            where id_approval= ".$db->escape($approval['id_approval'])."
+            order by seq
+            ";
+
+            $query = $db->query($select);
+
+            $approval_path = [];
+
+            $next_user_name = "?";
+
+            $pendingSteps = false;
+
+            $firstStep = false;
+
+            foreach($query->getResultArray() as $row){
+
+                if($row['status']=="-"){
+                    $pendingSteps = true;
+                    $nextStep = $row;
+                }
+                                
+                $approval_path[] = $row;
+
+                if(!$firstStep){
+                    $firstStep = $row;
+                }
+
+                $lastStep = $row;
+
+            }
+
+            //Si no hay mas pendientes terminar con este Approval
+            if(!$pendingSteps){
+                return true;
+            }
+
+            
+
+            switch($nextStep['approval_type']){
+                case "Notification":
+                    
+                    //Actualizar el registro
+                    $update = "update md_approvals_users 
+                    set status='Notified', status_set_at=now(), receive_at=now(),comment=''
+                    where id_approval=".$db->escape($nextStep['id_approval'])."
+                    and user_name=".$db->escape($nextStep['user_name'])." limit 1";
+
+                    $query = $db->query($update);
+
+                    if($db->affectedRows()==0){
+                        return false;
+                    }
+
+                    //TODO Enviar el correo con la informacion
+
+                    //Como es notificacion y ya fue procesada revisar el siguiente paso
+                    processApproval($approval_hash);
+
+                    return true;
+
+                    break;
+                case "Approval":
+
+                    //Actualizar el registro
+                    $update = "update md_approvals_users 
+                    set receive_at=now()
+                    where id_approval=".$db->escape($nextStep['id_approval'])."
+                    and user_name=".$db->escape($nextStep['user_name'])." limit 1";
+
+                    $query = $db->query($update);
+
+                    if($db->affectedRows()==0){
+                        return false;
+                    }
+
+                    //TODO Enviar el correo con la informacion
+
+                    return true;
+
+                break;
+            }
+
+        }catch(Exception $e){
+            return false;
+        }
+    }
+
+    public function applyAction(){
+        $db = db_connect();
+
+        $extra = [];
+
+        $json['error'] = 0;
+        $json['message'] = "";
+        
+        try {   
+            
+            //Revisar que el approval exista y que no sea Draft
+            $select = "select a.* from md_approvals a
+            left join ma_users b on a.drafter = b.user_name
+            where approval_hash = ".$db->escape($this->request->getVar('approval_step_approval_hash'))." and status not in ('Draft')";
+            
+            $query = $db->query($select);
+
+            $approval = $query->getRowArray();
+
+            if(!isset($approval)){
+                $json['message'] = "Approval not found";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+            //Traer el approval_path
+            $select = "
+            select a.* from md_approvals_users a
+            left join ma_users b on a.user_name = b.user_name
+            where id_approval= ".$db->escape($approval['id_approval'])."
+            order by seq
+            ";
+
+            $query = $db->query($select);
+
+            $approval_path = [];
+
+            $next_user_name = "?";
+
+            foreach($query->getResultArray() as $row){
+
+                
+
+                if($row['status']=="-"){
+                    $row['comment'] = "-";
+                    $row['status'] = "Pending";
+                }
+                
+                if($row['status_set_at']==""){
+                    $row['status_set_at']="-";
+                }
+                
+                $approval_path[] = $row;
+
+                if($row['approval_type']=="Approval" && $row['status']=="Pending" && $next_user_name=="?"){
+                    $next_user_name = $row['user_name'];
+                }
+
+            }
+
+            $json['next_user_name'] = $next_user_name;
+
+            if($next_user_name != session()->get('user_name')){
+                $json['message'] = "You can not approve this at this moment";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+            
+            //Aplicar la accion enviada
+            switch($this->request->getVar('approval_step_action')){
+                case "Approve":
+                    $action_to_apply = "Approved";
+                    break;
+                case "Reject":
+                    $action_to_apply = "Rejected";
+                    break;
+            }
+            $update = "update md_approvals_users set 
+            status= ".$db->escape($action_to_apply).", 
+            status_set_at=now(), 
+            comment=".$db->escape($this->request->getVar('approval_step_comment'))."
+            where id_approval = ".$db->escape($approval['id_approval'])."
+            and user_name = ".$db->escape(session()->get('user_name'))."
+            and status='-'
+            ";
+
+            $query = $db->query($update);
+
+            //Revisar si se aplico el update
+            $select = "select * from md_approvals_users where id_approval = ".$db->escape($approval['id_approval'])." and user_name = ".$db->escape(session()->get('user_name'))."";
+            
+            $query = $db->query($select);
+
+            $row = $query->getRowArray();
+
+            if($row['status'] != $action_to_apply){
+                $json['message'] = "Error updatating the approval";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+            $json['message'] = "Approval successfully updated";
+            $json['approval'] = $approval;
+
+            return $this->respond($json, 200);
+
+        }catch(Exception $e){
+            $json['e'] = $e->getMessage();
+            $json['message'] = "Error getting approvals list";
+            $json['error']=1;
+            return $this->respond($json, 500);
+        }
+
+    }
+
     public function View($approval_hash){
         $db = db_connect();
 
