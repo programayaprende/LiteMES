@@ -70,14 +70,14 @@ class Approvals extends SecureController{
         }
     }
 
-    public function processApproval($approval_hash){
+    static function processApproval($approval_hash){
         $db = db_connect();
 
         try{
             //Revisar que el approval exista y que no sea Draft
             $select = "select a.* from md_approvals a
             left join ma_users b on a.drafter = b.user_name
-            where approval_hash = ".$db->escape($this->request->getVar('approval_step_approval_hash'))." and status not in ('Draft')";
+            where approval_hash = ".$db->escape($approval_hash)." and status not in ('Draft')";
 
             $query = $db->query($select);
 
@@ -105,11 +105,19 @@ class Approvals extends SecureController{
 
             $firstStep = false;
 
+            $nextStep = false;
+
             foreach($query->getResultArray() as $row){
+
+                if($row['status']=="Pending"){
+                    return true;
+                }
 
                 if($row['status']=="-"){
                     $pendingSteps = true;
-                    $nextStep = $row;
+                    if(!$nextStep){
+                        $nextStep = $row;
+                    }
                 }
                                 
                 $approval_path[] = $row;
@@ -122,13 +130,17 @@ class Approvals extends SecureController{
 
             }
 
+            //print_r($approval_path);
+
             //Si no hay mas pendientes terminar con este Approval
             if(!$pendingSteps){
+
+                //Revisar cual es el path
+                //echo "<pre>"; print_r($approval_path); echo "</pre>";
+
                 return true;
             }
-
             
-
             switch($nextStep['approval_type']){
                 case "Notification":
                     
@@ -147,16 +159,17 @@ class Approvals extends SecureController{
                     //TODO Enviar el correo con la informacion
 
                     //Como es notificacion y ya fue procesada revisar el siguiente paso
-                    processApproval($approval_hash);
+                    Approvals::processApproval($approval_hash);
 
                     return true;
 
-                    break;
+                break;
                 case "Approval":
+                case "Concent":
 
                     //Actualizar el registro
                     $update = "update md_approvals_users 
-                    set receive_at=now()
+                    set receive_at=now(), status='Pending'
                     where id_approval=".$db->escape($nextStep['id_approval'])."
                     and user_name=".$db->escape($nextStep['user_name'])." limit 1";
 
@@ -172,6 +185,7 @@ class Approvals extends SecureController{
 
                 break;
             }
+           
 
         }catch(Exception $e){
             return false;
