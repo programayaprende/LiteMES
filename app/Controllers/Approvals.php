@@ -106,11 +106,32 @@ class Approvals extends SecureController{
             $firstStep = false;
 
             $nextStep = false;
+            $rejected = false;
+
+            $approvedStepsCount=0;
+            $consentStepsCount=0;
+            $notifiedStepsCount=0;
 
             foreach($query->getResultArray() as $row){
 
                 if($row['status']=="Pending"){
                     return true;
+                }
+
+                if($row['status']=="Rejected"){
+                    $rejected = true;                    
+                }
+
+                if($row['status']=="Approved"){
+                    $approvedStepsCount++;
+                }
+                
+                if($row['status']=="Consent"){
+                    $consentStepsCount++;
+                }
+                
+                if($row['status']=="Notified"){
+                    $notifiedStepsCount++;
                 }
 
                 if($row['status']=="-"){
@@ -130,14 +151,59 @@ class Approvals extends SecureController{
 
             }
 
-            //print_r($approval_path);
+            //Si el documento esta rechazado no hay mas pasos pendientes
+            if($rejected){                
+                $pendingSteps = false;
+            }
 
-            //Si no hay mas pendientes terminar con este Approval
+            //Si no hay mas pendientes terminar con este Approval            
             if(!$pendingSteps){
 
-                //Revisar cual es el path
-                //echo "<pre>"; print_r($approval_path); echo "</pre>";
+                //Si esta rechazado pero el approval tiene status 'Pending' cambiar a Rejected
+                if($rejected && $approval['status']!="Rejected"){
+                    $update = "
+                    update md_approvals set status='Rejected', finished_at=now() where approval_hash=".$db->escape($approval_hash)."  limit 1
+                    ";
+                    $query = $db->query($update);
 
+                    //Enviar correo al creado avisando del rechazo
+
+                    return true;
+                }
+
+
+                if($approval['status']=="Pending"){
+                    if($approvedStepsCount>0){
+                        $update = "
+                        update md_approvals set status='Approved', finished_at=now() where approval_hash=".$db->escape($approval_hash)."  limit 1
+                        ";
+                        $query = $db->query($update);
+
+                        //Enviar correo al creado avisando del fin del documento
+
+                        return true;
+                    }
+
+                    if($consentStepsCount>0){
+                        $update = "
+                        update md_approvals set status='Consent', finished_at=now() where approval_hash=".$db->escape($approval_hash)."  limit 1
+                        ";
+                        $query = $db->query($update);
+
+                        //Enviar correo al creador avisando del fin del documento
+
+                        return true;
+                    }
+                    
+                    if($notifiedStepsCount>0){
+                        $update = "
+                        update md_approvals set status='Notified', finished_at=now() where approval_hash=".$db->escape($approval_hash)."  limit 1
+                        ";
+                        $query = $db->query($update);
+
+                        return true;
+                    }
+                }
                 return true;
             }
             
@@ -351,7 +417,7 @@ class Approvals extends SecureController{
             foreach($query->getResultArray() as $row){
                 if($row['status']=="-"){
                     $row['comment'] = "-";
-                    $row['status'] = "Pending";
+                    $row['status'] = "-";
                 }
                 if($row['status_set_at']==""){
                     $row['status_set_at']="-";
