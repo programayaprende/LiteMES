@@ -36,6 +36,76 @@ class Approvals extends SecureController{
         echo view("approvals/approvals_inbox",$data);
         echo view("templates/footer",$data);
     }
+    
+    public function Pendings(){
+        //Informacion para el desplegado de la pagina
+        $data['page_title']= "Approvals | Sent";
+        $data['style_files'][] = '';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
+        $data['js_files'][] = '<script> var DEFAULT_ACTION = "pendings"; </script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/approvals/inbox.js"></script>';
+        
+        echo view("templates/header",$data);
+        echo view("approvals/approvals_inbox",$data);
+        echo view("templates/footer",$data);
+    }
+
+    public function Approved(){
+        //Informacion para el desplegado de la pagina
+        $data['page_title']= "Approvals | Sent";
+        $data['style_files'][] = '';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
+        $data['js_files'][] = '<script> var DEFAULT_ACTION = "approved"; </script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/approvals/inbox.js"></script>';
+        
+        echo view("templates/header",$data);
+        echo view("approvals/approvals_inbox",$data);
+        echo view("templates/footer",$data);
+    }
+
+    public function Concent(){
+        //Informacion para el desplegado de la pagina
+        $data['page_title']= "Approvals | Sent";
+        $data['style_files'][] = '';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
+        $data['js_files'][] = '<script> var DEFAULT_ACTION = "concent"; </script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/approvals/inbox.js"></script>';
+        
+        echo view("templates/header",$data);
+        echo view("approvals/approvals_inbox",$data);
+        echo view("templates/footer",$data);
+    }
+
+    public function Rejected(){
+        //Informacion para el desplegado de la pagina
+        $data['page_title']= "Approvals | Sent";
+        $data['style_files'][] = '';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
+        $data['js_files'][] = '<script> var DEFAULT_ACTION = "rejected"; </script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/approvals/inbox.js"></script>';
+        
+        echo view("templates/header",$data);
+        echo view("approvals/approvals_inbox",$data);
+        echo view("templates/footer",$data);
+    }
+
+    public function Notifications(){
+        //Informacion para el desplegado de la pagina
+        $data['page_title']= "Approvals | Sent";
+        $data['style_files'][] = '';
+        $data['style_files'][] = '<link href="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />';
+        $data['js_files'][] = '<script> var DEFAULT_ACTION = "notifications"; </script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/plugins/custom/datatables/datatables.bundle.js"></script>';
+        $data['js_files'][] = '<script src="'.base_url().'/assets/js/pages/custom/approvals/inbox.js"></script>';
+        
+        echo view("templates/header",$data);
+        echo view("approvals/approvals_inbox",$data);
+        echo view("templates/footer",$data);
+    }
 
     public function info(){
         echo phpinfo();
@@ -271,7 +341,7 @@ class Approvals extends SecureController{
             //Revisar que el approval exista y que no sea Draft
             $select = "select a.* from md_approvals a
             left join ma_users b on a.drafter = b.user_name
-            where approval_hash = ".$db->escape($this->request->getVar('approval_step_approval_hash'))." and status not in ('Draft')";
+            where approval_hash = ".$db->escape($this->request->getVar('approval_step_approval_hash'))." and status in ('Pending')";
             
             $query = $db->query($select);
 
@@ -299,11 +369,9 @@ class Approvals extends SecureController{
 
             foreach($query->getResultArray() as $row){
 
-                
-
                 if($row['status']=="-"){
                     $row['comment'] = "-";
-                    $row['status'] = "Pending";
+                    //$row['status'] = "Pending";
                 }
                 
                 if($row['status_set_at']==""){
@@ -312,7 +380,7 @@ class Approvals extends SecureController{
                 
                 $approval_path[] = $row;
 
-                if($row['approval_type']=="Approval" && $row['status']=="Pending" && $next_user_name=="?"){
+                if( ($row['approval_type']=="Approval" || $row['approval_type']=="Concent") && $row['status']=="Pending" && $next_user_name=="?"){
                     $next_user_name = $row['user_name'];
                 }
 
@@ -331,6 +399,9 @@ class Approvals extends SecureController{
                 case "Approve":
                     $action_to_apply = "Approved";
                     break;
+                case "Concent":
+                    $action_to_apply = "Concent";
+                    break;
                 case "Reject":
                     $action_to_apply = "Rejected";
                     break;
@@ -341,7 +412,7 @@ class Approvals extends SecureController{
             comment=".$db->escape($this->request->getVar('approval_step_comment'))."
             where id_approval = ".$db->escape($approval['id_approval'])."
             and user_name = ".$db->escape(session()->get('user_name'))."
-            and status='-'
+            and status='Pending'
             ";
 
             $query = $db->query($update);
@@ -361,6 +432,8 @@ class Approvals extends SecureController{
 
             $json['message'] = "Approval successfully updated";
             $json['approval'] = $approval;
+
+            Approvals::processApproval($approval['approval_hash']);
 
             return $this->respond($json, 200);
 
@@ -485,9 +558,9 @@ class Approvals extends SecureController{
         $json['codition'] = $this->request->getVar('condition');
         $json['sort'] = $this->request->getVar('sort');
         
-        try {   
+        try {
 
-            //Contruir el query
+            //Listado de enviados
             if($this->request->getVar('condition')=="sent" || $initFilter=="Sent"){
 
                 //Revisar filtros extras
@@ -509,15 +582,177 @@ class Approvals extends SecureController{
 
                 $select = "
                 select 
-                    a.*,
-                    b.first_name,
-                    b.last_name,
-                    b.job_description 
+                    a.*
                 from md_approvals a left join ma_users b on a.drafter = b.user_name 
                 where 
                     drafter = ".$db->escape(session()->get('user_name'))." 
                     and status not in ('Draft')
                 order by ".$field." ".$sort;
+            }
+
+            //Listado de MisPendientes
+            if($this->request->getVar('condition')=="pendings" || $initFilter=="Pendings"){
+
+                //Revisar filtros extras
+                foreach($_REQUEST as $field=>$value){
+                    if(substr($field,0,7)!="filter_" or $value==""){
+                        continue;
+                    }
+                    switch($field){
+                        case "filter_name":
+                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
+                            $dataBuilder->where($condition);
+                            break;
+                    }
+                }
+
+                //Checar si se mando info para el sort
+                $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'desc';
+                $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'submit_at';
+
+                $select = "
+                select 
+                        a.*
+                from md_approvals a left join ma_users b on a.drafter = b.user_name 
+                where 
+                    id_approval in (
+                        select id_approval from md_approvals_users where user_name=".$db->escape(session()->get('user_name'))." and status='Pending'
+                    )
+                    and status in ('Pending')
+                order by ".$field." ".$sort;
+                
+            }
+
+            //Listado de Approved
+            if($this->request->getVar('condition')=="approved" || $initFilter=="Approved"){
+
+                //Revisar filtros extras
+                foreach($_REQUEST as $field=>$value){
+                    if(substr($field,0,7)!="filter_" or $value==""){
+                        continue;
+                    }
+                    switch($field){
+                        case "filter_name":
+                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
+                            $dataBuilder->where($condition);
+                            break;
+                    }
+                }
+
+                //Checar si se mando info para el sort
+                $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'desc';
+                $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'submit_at';
+
+                $select = "
+                select 
+                        a.* 
+                from md_approvals a left join ma_users b on a.drafter = b.user_name 
+                where 
+                    id_approval in (
+                        select id_approval from md_approvals_users where user_name=".$db->escape(session()->get('user_name'))." and status='Approved'
+                    )
+                    and status not in ('Draft')
+                order by ".$field." ".$sort;
+                
+            }
+
+            //Listado de Concent
+            if($this->request->getVar('condition')=="concent" || $initFilter=="Concent"){
+
+                //Revisar filtros extras
+                foreach($_REQUEST as $field=>$value){
+                    if(substr($field,0,7)!="filter_" or $value==""){
+                        continue;
+                    }
+                    switch($field){
+                        case "filter_name":
+                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
+                            $dataBuilder->where($condition);
+                            break;
+                    }
+                }
+
+                //Checar si se mando info para el sort
+                $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'desc';
+                $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'submit_at';
+
+                $select = "
+                select 
+                        a.* 
+                from md_approvals a left join ma_users b on a.drafter = b.user_name 
+                where 
+                    id_approval in (
+                        select id_approval from md_approvals_users where user_name=".$db->escape(session()->get('user_name'))." and status='Concent'
+                    )
+                    and status not in ('Draft')
+                order by ".$field." ".$sort;
+                
+            }
+
+            //Listado de Rejected
+            if($this->request->getVar('condition')=="rejected" || $initFilter=="Rejected"){
+
+                //Revisar filtros extras
+                foreach($_REQUEST as $field=>$value){
+                    if(substr($field,0,7)!="filter_" or $value==""){
+                        continue;
+                    }
+                    switch($field){
+                        case "filter_name":
+                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
+                            $dataBuilder->where($condition);
+                            break;
+                    }
+                }
+
+                //Checar si se mando info para el sort
+                $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'desc';
+                $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'submit_at';
+
+                $select = "
+                select 
+                        a.* 
+                from md_approvals a left join ma_users b on a.drafter = b.user_name 
+                where 
+                    id_approval in (
+                        select id_approval from md_approvals_users where user_name=".$db->escape(session()->get('user_name'))." and status='Rejected'
+                    )
+                    and status not in ('Draft')
+                order by ".$field." ".$sort;
+                
+            }
+
+            //Listado de Notifications
+            if($this->request->getVar('condition')=="notifications" || $initFilter=="Notifications"){
+
+                //Revisar filtros extras
+                foreach($_REQUEST as $field=>$value){
+                    if(substr($field,0,7)!="filter_" or $value==""){
+                        continue;
+                    }
+                    switch($field){
+                        case "filter_name":
+                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
+                            $dataBuilder->where($condition);
+                            break;
+                    }
+                }
+
+                //Checar si se mando info para el sort
+                $sort = !empty($datatable['sort']['sort']) ? $datatable['sort']['sort'] : 'desc';
+                $field = !empty($datatable['sort']['field']) ? $datatable['sort']['field'] : 'submit_at';
+
+                $select = "
+                select 
+                        a.* 
+                from md_approvals a left join ma_users b on a.drafter = b.user_name 
+                where 
+                    id_approval in (
+                        select id_approval from md_approvals_users where user_name=".$db->escape(session()->get('user_name'))." and status='Notified'
+                    )
+                    and status not in ('Draft')
+                order by ".$field." ".$sort;
+                
             }
 
             //Revisar que pagina quieren ver        
@@ -698,6 +933,9 @@ class Approvals extends SecureController{
                 $json['error']=1;
                 return $this->respond($json, 200);
             }
+
+            //Procesar el approval
+            Approvals::processApproval($this->request->getVar('approval_hash'));
 
             $json['message'] = "Successfully send";            
             return $this->respond($json, 200);
@@ -909,9 +1147,24 @@ class Approvals extends SecureController{
         $json['message'] = "";
 
         try {
-            $insert = "insert into md_approvals(drafter,status,created_at)
-            values (?,'Draft',now())";
-            $insert = $db->query($insert,[session()->get('user_name')]);
+
+
+            $select = "select * from ma_users where user_name=? limit 1";
+            
+            $query = $db->query($select,[session()->get('user_name')]);
+
+            $user = $query->getRowArray();
+
+            if(!isset($user)){
+                $json['message'] = "User not found";
+                $json['error']=1;
+                return $this->respond($json, 200);
+            }
+
+
+            $insert = "insert into md_approvals(drafter,status,first_name,last_name,job_description,created_at)
+            values (?,'Draft',?,?,?,now())";
+            $insert = $db->query($insert,[session()->get('user_name'), $user['first_name'], $user['last_name'], $user['job_description']]);
             
             $json['id_approval'] = $id_approval = $db->insertID();
             $json['approval_hash'] = $approval_hash = md5("approval_hash_".$id_approval);

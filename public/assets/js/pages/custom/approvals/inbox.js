@@ -493,6 +493,306 @@ var KTAppInbox = function() {
             }
         });        
     }
+
+    var _showPendings = function(){
+
+        console.log("_showPendings");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar new
+        KTUtil.addClass(_newEl, 'd-none');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+        
+        $.ajax({
+            url: BASE_URL + '/Approvals/GetApprovals/Pendings',
+            type: "post",
+            dataType: "json"
+        })
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
+            if(res.error>0){
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });                              
+            } else {                 
+                //$("#main_subtitle").html(res.role_data.name);
+                //$("#name").val(res.role_data.name);
+                //$("#description").val(res.role_data.description);
+                //$("#id").val(res.role_data.id);
+                
+                loading.hide();
+        
+                //Mostrar listado
+                KTUtil.addClass(_listEl, 'd-block');
+                KTUtil.removeClass(_listEl, 'd-none');
+
+                console.log("x");
+                
+                dataUsers = res.data;
+                reload_table();
+            }
+        });        
+    }
+
+    var _showApproved = function(){
+
+        console.log("_showApproved");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar new
+        KTUtil.addClass(_newEl, 'd-none');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+        
+        $.ajax({
+            url: BASE_URL + '/Approvals/GetApprovals/Approved',
+            type: "post",
+            dataType: "json"
+        })
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
+            if(res.error>0){
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });                              
+            } else {                 
+                //$("#main_subtitle").html(res.role_data.name);
+                //$("#name").val(res.role_data.name);
+                //$("#description").val(res.role_data.description);
+                //$("#id").val(res.role_data.id);
+                
+                loading.hide();
+        
+                //Mostrar listado
+                KTUtil.addClass(_listEl, 'd-block');
+                KTUtil.removeClass(_listEl, 'd-none');
+
+                console.log("x");
+                
+                dataUsers = res.data;
+                reload_table();
+            }
+        });        
+    }
+
+    var _showConcent = function(){
+
+        console.log("_showConcent");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar new
+        KTUtil.addClass(_newEl, 'd-none');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+        
+        $.ajax({
+            url: BASE_URL + '/Approvals/GetApprovals/Concent',
+            type: "post",
+            dataType: "json"
+        })
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
+            if(res.error>0){
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });                              
+            } else {                 
+                //$("#main_subtitle").html(res.role_data.name);
+                //$("#name").val(res.role_data.name);
+                //$("#description").val(res.role_data.description);
+                //$("#id").val(res.role_data.id);
+                
+                loading.hide();
+        
+                //Mostrar listado
+                KTUtil.addClass(_listEl, 'd-block');
+                KTUtil.removeClass(_listEl, 'd-none');
+
+                console.log("x");
+                
+                dataUsers = res.data;
+                reload_table();
+            }
+        });        
+    }
+
+    var _showRejected = function(){
+
+        console.log("_showRejected");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar new
+        KTUtil.addClass(_newEl, 'd-none');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+        
+        $.ajax({
+            url: BASE_URL + '/Approvals/GetApprovals/Rejected',
+            type: "post",
+            dataType: "json"
+        })
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
+            if(res.error>0){
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });                              
+            } else {                 
+                //$("#main_subtitle").html(res.role_data.name);
+                //$("#name").val(res.role_data.name);
+                //$("#description").val(res.role_data.description);
+                //$("#id").val(res.role_data.id);
+                
+                loading.hide();
+        
+                //Mostrar listado
+                KTUtil.addClass(_listEl, 'd-block');
+                KTUtil.removeClass(_listEl, 'd-none');
+
+                console.log("x");
+                
+                dataUsers = res.data;
+                reload_table();
+            }
+        });        
+    }
+
+    var _showNotifications = function(){
+
+        console.log("_showNotifications");
+
+        // demo loading
+        var loading = new KTDialog({
+            'type': 'loader',
+            'placement': 'top center',
+            'message': 'Loading ...'
+        });
+        loading.show();
+
+        //Ocultar new
+        KTUtil.addClass(_newEl, 'd-none');
+        KTUtil.removeClass(_newEl, 'd-block');
+
+        //Ocultar view
+        KTUtil.addClass(_viewEl, 'd-none');
+        KTUtil.removeClass(_viewEl, 'd-block');
+        
+        $.ajax({
+            url: BASE_URL + '/Approvals/GetApprovals/Notifications',
+            type: "post",
+            dataType: "json"
+        })
+        .done(function(res){            
+            console.log("res");
+            console.log(res);
+            if(res.error>0){
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });                              
+            } else {                 
+                //$("#main_subtitle").html(res.role_data.name);
+                //$("#name").val(res.role_data.name);
+                //$("#description").val(res.role_data.description);
+                //$("#id").val(res.role_data.id);
+                
+                loading.hide();
+        
+                //Mostrar listado
+                KTUtil.addClass(_listEl, 'd-block');
+                KTUtil.removeClass(_listEl, 'd-none');
+
+                console.log("x");
+                
+                dataUsers = res.data;
+                reload_table();
+            }
+        });        
+    }
     
     var _startNew = function(){
 
@@ -710,6 +1010,26 @@ var KTAppInbox = function() {
 
             if(DEFAULT_ACTION=="sent"){
                 _showSent();
+            }
+
+            if(DEFAULT_ACTION=="pendings"){
+                _showPendings();
+            }
+
+            if(DEFAULT_ACTION=="approved"){
+                _showApproved();
+            }
+
+            if(DEFAULT_ACTION=="concent"){
+                _showConcent();
+            }
+
+            if(DEFAULT_ACTION=="rejected"){
+                _showRejected();
+            }
+
+            if(DEFAULT_ACTION=="notifications"){
+                _showNotifications();
             }
             
         },
@@ -1193,6 +1513,30 @@ var KTAppInbox = function() {
             _initEditor(_newEl, 'kt_inbox_new_editor');
             _initAttachments('kt_inbox_new_attachments');            
         },
+
+        showSent: function(){
+            _showSent();
+        },
+
+        showPendings: function(){
+            _showPendings();
+        },
+
+        showApproved: function(){
+            _showApproved();
+        },
+
+        showRejected: function(){
+            _showRejected();
+        },
+
+        showConcent: function(){
+            _showConcent();
+        },
+
+        showNotifications: function(){
+            _showNotifications();
+        }
     };
 }();
 

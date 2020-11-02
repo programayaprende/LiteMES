@@ -676,15 +676,15 @@
 												</span>
 											</li>
 											<li class="menu-item" aria-haspopup="true">
-												<a href="layout/themes/aside-light.html" class="menu-link">
+												<a href="<?=base_url()?>/Approvals/Pendings" class="menu-link">
 													<i class="menu-bullet menu-bullet-dot">
 														<span></span>
 													</i>
-													<span class="menu-text">Inbox</span>
+													<span class="menu-text">Pendientes</span>
 												</a>
 											</li>
 											<li class="menu-item" aria-haspopup="true">
-												<a href="layout/themes/aside-light.html" class="menu-link">
+												<a href="<?=base_url()?>/Approvals/New" class="menu-link">
 													<i class="menu-bullet menu-bullet-dot">
 														<span></span>
 													</i>
