@@ -2,6 +2,10 @@
 
 var dataUsers = null;
 var dataTable;
+var searchingTimeout;
+var actualView = "";
+var newView = "";
+var listSearching = "";
 
 // Class definition
 var KTAppInbox = function() {
@@ -434,9 +438,23 @@ var KTAppInbox = function() {
         KTUtil.addClass(_newEl, 'd-none');
     }
 
-    var _showSent = function(){
+    var _showList = function(){
+        //Mostrar listado
+        //listSearching  = "";
+        //$("#list_search_text").val("");
+        KTUtil.addClass(_listEl, 'd-block');
+        KTUtil.removeClass(_listEl, 'd-none');        
+        reload_table();
+    }
 
-        console.log("_showSent");
+    var _showSent = function(){
+        newView = "showSent";
+        if(actualView != newView){
+            $("#list_search_text").val("");
+            listSearching = "";
+        }
+        actualView = newView;
+        console.log(actualView);
 
         // demo loading
         var loading = new KTDialog({
@@ -457,7 +475,9 @@ var KTAppInbox = function() {
         $.ajax({
             url: BASE_URL + '/Approvals/GetApprovals/Sent',
             type: "post",
-            dataType: "json"
+            dataType: "json",
+            method: "POST",
+            data: { search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -475,28 +495,21 @@ var KTAppInbox = function() {
                     KTUtil.scrollTop();
                 });                              
             } else {                 
-                //$("#main_subtitle").html(res.role_data.name);
-                //$("#name").val(res.role_data.name);
-                //$("#description").val(res.role_data.description);
-                //$("#id").val(res.role_data.id);
                 
-                loading.hide();
-        
-                //Mostrar listado
-                KTUtil.addClass(_listEl, 'd-block');
-                KTUtil.removeClass(_listEl, 'd-none');
-
-                console.log("x");
-                
+                loading.hide();        
                 dataUsers = res.data;
-                reload_table();
+                _showList();
             }
         });        
     }
 
     var _showPendings = function(){
-
-        console.log("_showPendings");
+        newView = "showPendings";
+        if(actualView != newView){
+            $("#list_search_text").val("");
+            listSearching = "";
+        }
+        actualView = newView;
 
         // demo loading
         var loading = new KTDialog({
@@ -517,7 +530,9 @@ var KTAppInbox = function() {
         $.ajax({
             url: BASE_URL + '/Approvals/GetApprovals/Pendings',
             type: "post",
-            dataType: "json"
+            dataType: "json",
+            method: "POST",
+            data: { search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -534,29 +549,22 @@ var KTAppInbox = function() {
                 }).then(function() {
                     KTUtil.scrollTop();
                 });                              
-            } else {                 
-                //$("#main_subtitle").html(res.role_data.name);
-                //$("#name").val(res.role_data.name);
-                //$("#description").val(res.role_data.description);
-                //$("#id").val(res.role_data.id);
-                
-                loading.hide();
-        
-                //Mostrar listado
-                KTUtil.addClass(_listEl, 'd-block');
-                KTUtil.removeClass(_listEl, 'd-none');
-
-                console.log("x");
-                
+            } else {                                 
+                loading.hide();        
                 dataUsers = res.data;
-                reload_table();
+                _showList();
             }
         });        
     }
 
     var _showApproved = function(){
 
-        console.log("_showApproved");
+        newView = "showApproved";
+        if(actualView != newView){
+            $("#list_search_text").val("");
+            listSearching = "";
+        }
+        actualView = newView;
 
         // demo loading
         var loading = new KTDialog({
@@ -577,7 +585,9 @@ var KTAppInbox = function() {
         $.ajax({
             url: BASE_URL + '/Approvals/GetApprovals/Approved',
             type: "post",
-            dataType: "json"
+            dataType: "json",
+            method: "POST",
+            data: { search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -595,28 +605,21 @@ var KTAppInbox = function() {
                     KTUtil.scrollTop();
                 });                              
             } else {                 
-                //$("#main_subtitle").html(res.role_data.name);
-                //$("#name").val(res.role_data.name);
-                //$("#description").val(res.role_data.description);
-                //$("#id").val(res.role_data.id);
-                
                 loading.hide();
-        
-                //Mostrar listado
-                KTUtil.addClass(_listEl, 'd-block');
-                KTUtil.removeClass(_listEl, 'd-none');
-
-                console.log("x");
-                
                 dataUsers = res.data;
-                reload_table();
+                _showList();        
             }
         });        
     }
 
     var _showConcent = function(){
 
-        console.log("_showConcent");
+        newView = "showConcent";
+        if(actualView != newView){
+            $("#list_search_text").val("");
+            listSearching = "";
+        }
+        actualView = newView;
 
         // demo loading
         var loading = new KTDialog({
@@ -637,7 +640,9 @@ var KTAppInbox = function() {
         $.ajax({
             url: BASE_URL + '/Approvals/GetApprovals/Concent',
             type: "post",
-            dataType: "json"
+            dataType: "json",
+            method: "POST",
+            data: { search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -654,29 +659,22 @@ var KTAppInbox = function() {
                 }).then(function() {
                     KTUtil.scrollTop();
                 });                              
-            } else {                 
-                //$("#main_subtitle").html(res.role_data.name);
-                //$("#name").val(res.role_data.name);
-                //$("#description").val(res.role_data.description);
-                //$("#id").val(res.role_data.id);
-                
+            } else {                                  
                 loading.hide();
-        
-                //Mostrar listado
-                KTUtil.addClass(_listEl, 'd-block');
-                KTUtil.removeClass(_listEl, 'd-none');
-
-                console.log("x");
-                
                 dataUsers = res.data;
-                reload_table();
+                _showList();
             }
         });        
     }
 
     var _showRejected = function(){
 
-        console.log("_showRejected");
+        newView = "showRejected";
+        if(actualView != newView){
+            $("#list_search_text").val("");
+            listSearching = "";
+        }
+        actualView = newView;
 
         // demo loading
         var loading = new KTDialog({
@@ -697,7 +695,9 @@ var KTAppInbox = function() {
         $.ajax({
             url: BASE_URL + '/Approvals/GetApprovals/Rejected',
             type: "post",
-            dataType: "json"
+            dataType: "json",
+            method: "POST",
+            data: { search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -714,29 +714,22 @@ var KTAppInbox = function() {
                 }).then(function() {
                     KTUtil.scrollTop();
                 });                              
-            } else {                 
-                //$("#main_subtitle").html(res.role_data.name);
-                //$("#name").val(res.role_data.name);
-                //$("#description").val(res.role_data.description);
-                //$("#id").val(res.role_data.id);
-                
-                loading.hide();
-        
-                //Mostrar listado
-                KTUtil.addClass(_listEl, 'd-block');
-                KTUtil.removeClass(_listEl, 'd-none');
-
-                console.log("x");
-                
+            } else {                
+                loading.hide();        
                 dataUsers = res.data;
-                reload_table();
+                _showList();
             }
         });        
     }
 
     var _showNotifications = function(){
 
-        console.log("_showNotifications");
+        newView = "showNotifications";
+        if(actualView != newView){
+            $("#list_search_text").val("");
+            listSearching = "";
+        }
+        actualView = newView;
 
         // demo loading
         var loading = new KTDialog({
@@ -757,7 +750,9 @@ var KTAppInbox = function() {
         $.ajax({
             url: BASE_URL + '/Approvals/GetApprovals/Notifications',
             type: "post",
-            dataType: "json"
+            dataType: "json",
+            method: "POST",
+            data: { search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -775,21 +770,9 @@ var KTAppInbox = function() {
                     KTUtil.scrollTop();
                 });                              
             } else {                 
-                //$("#main_subtitle").html(res.role_data.name);
-                //$("#name").val(res.role_data.name);
-                //$("#description").val(res.role_data.description);
-                //$("#id").val(res.role_data.id);
-                
                 loading.hide();
-        
-                //Mostrar listado
-                KTUtil.addClass(_listEl, 'd-block');
-                KTUtil.removeClass(_listEl, 'd-none');
-
-                console.log("x");
-                
                 dataUsers = res.data;
-                reload_table();
+                _showList();
             }
         });        
     }
@@ -1218,10 +1201,38 @@ var KTAppInbox = function() {
 
             dataTable = $('#kt_datatable');
 
+            $("#list_search_text").keyup(function(event) {
+                
+                try {
+                    clearTimeout(searchingTimeout);
+                } catch (error) {
+                    
+                }
+                
+                var actText = $("#list_search_text").val();
+                var actLength = actText.length;
+
+                if(actLength>=4){
+                    listSearching = actText;
+                    searchingTimeout = setTimeout(function(){
+                        console.log(actualView);
+                        switch(actualView){
+                            case "showSent":
+                                _showSent();
+                                break;
+                        }
+                    },1000);
+                }
+                
+            });
+
             // begin first table
             dataTable.DataTable({
                 responsive: true,
                 data: dataUsers,
+                searching: false,
+                bLengthChange: false,
+                pageLength: 20,
                 columnDefs: [
                     {
                         targets: 0,
@@ -1514,27 +1525,27 @@ var KTAppInbox = function() {
             _initAttachments('kt_inbox_new_attachments');            
         },
 
-        showSent: function(){
+        showSent: function(){            
             _showSent();
         },
 
-        showPendings: function(){
+        showPendings: function(){            
             _showPendings();
         },
 
-        showApproved: function(){
+        showApproved: function(){            
             _showApproved();
         },
 
-        showRejected: function(){
+        showRejected: function(){            
             _showRejected();
         },
 
-        showConcent: function(){
+        showConcent: function(){            
             _showConcent();
         },
 
-        showNotifications: function(){
+        showNotifications: function(){            
             _showNotifications();
         }
     };

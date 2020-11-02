@@ -680,7 +680,7 @@
 													<i class="menu-bullet menu-bullet-dot">
 														<span></span>
 													</i>
-													<span class="menu-text">Pendientes</span>
+													<span class="menu-text">Pendings</span>
 												</a>
 											</li>
 											<li class="menu-item" aria-haspopup="true">

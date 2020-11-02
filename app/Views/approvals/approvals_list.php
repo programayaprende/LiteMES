@@ -16,7 +16,7 @@
                 <!--begin::Search-->
                 <div class="col-xxl-3 d-flex order-1 order-xxl-2 align-items-center justify-content-center">
                     <div class="input-group input-group-lg input-group-solid my-2">
-                        <input type="text" class="form-control pl-4" placeholder="Search..." />
+                        <input type="text" class="form-control pl-4" placeholder="Search..." id="list_search_text" />
                         <div class="input-group-append">
                             <span class="input-group-text pr-3">
                                 <span class="svg-icon svg-icon-lg">
@@ -38,17 +38,21 @@
                 <!--begin::Pagination-->
                 <div class="col-12 col-sm-6 col-xxl-4 order-2 order-xxl-3 d-flex align-items-center justify-content-sm-end text-right my-2">
                     <!--begin::Per Page Dropdown-->
+                    <!--
                     <div class="d-flex align-items-center mr-2">
                         <span class="text-muted font-weight-bold mr-2">1 - 50 of 235</span>                        
                     </div>
+                    -->
                     <!--end::Per Page Dropdown-->
                     <!--begin::Arrow Buttons-->
+                    <!--
                     <span class="btn btn-default btn-icon btn-sm mr-2" data-toggle="tooltip" title="Previose page">
                         <i class="ki ki-bold-arrow-back icon-sm"></i>
                     </span>
                     <span class="btn btn-default btn-icon btn-sm mr-2" data-toggle="tooltip" title="Next page">
                         <i class="ki ki-bold-arrow-next icon-sm"></i>
                     </span>
+                    -->
                     <!--end::Arrow Buttons-->
                     <!--begin::Sort Dropdown-->
                     <div class="dropdown mr-2" data-toggle="tooltip" title="Sort">
@@ -95,39 +99,7 @@
                 ?>
                 <!--begin::Items-->
                 <div class="d-none list list-hover min-w-500px" data-inbox="list" id="approval_list_table">                                        
-                    <?php
-                    for($c=0;$c<10;$c++){
-                    ?>
-                    <div class="d-flex align-items-start list-item card-spacer-x py-3" data-inbox="message">
-                        <!--begin::Toolbar-->
-                        <div class="d-flex align-items-center">                            
-                            <!--begin::Author-->
-                            <div class="d-flex align-items-center flex-wrap w-xxl-200px mr-3 mt-2">
-                                Jonathan Araizax <br>
-                                App Developer
-                            </div>
-                            <!--end::Author-->
-                        </div>
-                        <!--end::Toolbar-->
-                        <!--begin::Info-->
-                        <div class="flex-grow-1 mt-2 mr-2">
-                            <div>
-                                <span class="font-weight-bolder font-size-lg mr-2">Digital PPV Customer Confirmation - Customer Confirmation </span>
-                            </div>                            
-                        </div>
-                        <!--end::Info-->
-                        <!--begin::Status-->
-                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right">
-                            <span class="label label-light-primary font-weight-bold label-inline mr-1">Pending</span>
-                        </div>
-                        <!--end::Status-->
-                        <!--begin::Datetime-->
-                        <div class="mt-2 mr-3 font-weight-bolder w-200px text-right">8:30 PM</div>
-                        <!--end::Datetime-->
-                    </div>
-                    <?php
-                    }
-                    ?>                    
+                                    
                 </div>
                 <!--end::Items-->
                 <?
