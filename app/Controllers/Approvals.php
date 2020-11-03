@@ -557,6 +557,8 @@ class Approvals extends SecureController{
 
         $json['codition'] = $this->request->getVar('condition');
         $json['sort'] = $this->request->getVar('sort');
+
+        $condition = "";
         
         try {
 
@@ -569,9 +571,9 @@ class Approvals extends SecureController{
                         continue;
                     }
                     switch($field){
-                        case "filter_name":
-                            $condition = "(name like '%".$value."%' or description like '%".$value."%')";
-                            $dataBuilder->where($condition);
+                        case "filter_search":
+                            $value = str_replace("'","",$value);
+                            $condition = "and (subject like '%".$value."%' or body like '%".$value."%')";
                             break;
                     }
                 }
@@ -587,6 +589,7 @@ class Approvals extends SecureController{
                 where 
                     drafter = ".$db->escape(session()->get('user_name'))." 
                     and status not in ('Draft')
+                    $condition
                 order by ".$field." ".$sort;
             }
 

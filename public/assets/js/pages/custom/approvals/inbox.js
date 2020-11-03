@@ -477,7 +477,7 @@ var KTAppInbox = function() {
             type: "post",
             dataType: "json",
             method: "POST",
-            data: { search: listSearching, sortType: "desc" }
+            data: { filter_search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -532,7 +532,7 @@ var KTAppInbox = function() {
             type: "post",
             dataType: "json",
             method: "POST",
-            data: { search: listSearching, sortType: "desc" }
+            data: { filter_search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -587,7 +587,7 @@ var KTAppInbox = function() {
             type: "post",
             dataType: "json",
             method: "POST",
-            data: { search: listSearching, sortType: "desc" }
+            data: { filter_search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -642,7 +642,7 @@ var KTAppInbox = function() {
             type: "post",
             dataType: "json",
             method: "POST",
-            data: { search: listSearching, sortType: "desc" }
+            data: { filter_search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -697,7 +697,7 @@ var KTAppInbox = function() {
             type: "post",
             dataType: "json",
             method: "POST",
-            data: { search: listSearching, sortType: "desc" }
+            data: { filter_search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -752,7 +752,7 @@ var KTAppInbox = function() {
             type: "post",
             dataType: "json",
             method: "POST",
-            data: { search: listSearching, sortType: "desc" }
+            data: { filter_search: listSearching, sortType: "desc" }
         })
         .done(function(res){            
             console.log("res");
@@ -1261,7 +1261,7 @@ var KTAppInbox = function() {
                     {
                         targets: 2,
                         render: function(data, type, full, meta) {                                                    
-                            return full[11];
+                            return full[12];
                         },
                     },
                     {
@@ -1484,7 +1484,7 @@ var KTAppInbox = function() {
                             }
                         }).then(function() {
                             KTUtil.scrollTop();
-                            //Go to Sent List
+                            _showSent();
                         });
                         return;
                     }
