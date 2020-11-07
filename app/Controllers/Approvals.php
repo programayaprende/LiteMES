@@ -141,6 +141,7 @@ class Approvals extends SecureController{
     }
 
     static function processApproval($approval_hash){
+        
         $db = db_connect();
 
         try{
