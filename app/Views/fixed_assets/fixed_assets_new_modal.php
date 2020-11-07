@@ -30,7 +30,7 @@
 
                     <div class="form-group">
                         <label>Model <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"  placeholder="Part Number" name="model"/>
+                        <input type="text" class="form-control"  placeholder="Model" name="model"/>
                     </div>
 
                     <div class="form-group">
@@ -45,7 +45,7 @@
 
                     <div class="form-group">
                         <label>Tariff Heading</label>
-                        <input type="text" class="form-control"  placeholder="Tariff Heading" name="tariff_heading"/>
+                        <input type="text" class="form-control"  placeholder="Tariff Heading" name="tariff_heading" maxlength="3"/>
                     </div>
 
                     <div class="form-group">

@@ -76,7 +76,7 @@ var KTAppsFixedAssetsListDatatable = function() {
         $(".show-new-modal").on("click",function(){
             console.log("show-new-modal");
 
-            $(this).attr("disabled", false);
+            $('.save-new-modal').attr("disabled", false);
 
             $("#newFixedAssetModal").modal("show");
 
@@ -97,12 +97,17 @@ var KTAppsFixedAssetsListDatatable = function() {
                 contentType: false,
                 processData: false
             })
-            .fail(function(jqXHR, textStatus, errorThrown ){
-                var msg = "";
+            .fail(function(jqXHR, textStatus, errorThrown ){                
                 console.log(textStatus);
                 console.log(jqXHR);
+                try{
+
+                    textStatus = jqXHR.responseJSON.lists_errors;
+                }catch(error){
+
+                }
                 swal.fire({
-                    html: "Sorry, looks like there are some errors detected, please try again. <br>(" + textStatus + ")",
+                    html: "Sorry, looks like there are some errors detected, please try again. <br>" + textStatus + "",
                     icon: "error",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
@@ -138,24 +143,11 @@ var KTAppsFixedAssetsListDatatable = function() {
                         customClass: {
                             confirmButton: "btn font-weight-bold btn-light-primary"
                         }
-                    }).then(function() {
+                    }).then(function() {                        
+                        $('#form-new-modal').trigger("reset");
+                        $("#show-new-modal").modal("hide");
                         KTUtil.scrollTop();
-                        console.log($("#after_action").val());
-                        switch($("#after_action").val()){
-                            case "save_and_continue":
-                                if($("#action").val()=="new"){
-                                    history.pushState({action: "edit",user_name: res.user_name}, 'Edit User', '/Users/Edit/' + res.user_name);
-                                }
-                                KTUserEdit.initUser(res.user_name);
-                                break;
-                            case "save_and_add":
-                                KTUserEdit.initNew();
-                                break;
-                            case "save_and_exit":
-                                window.location = BASE_URL + "/Users";                             
-                                break;                            
-                        }                        
-                        
+                        //_reloadList();
                     });
                     return;
                 }

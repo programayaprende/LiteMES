@@ -38,7 +38,7 @@ class FixedAssets extends SecureController{
                     SQL_CALC_FOUND_ROWS a.*
                 from ma_fixed_assets a left join ma_users b on a.updated_by = b.user_name 
                 where                     
-                    a.fixed_assets_status not in ('Deleted')                    
+                    a.fixed_asset_status not in ('Deleted')                    
                 limit ".$start." , ".$length;
             
             $query = $db->query($select);
@@ -78,11 +78,16 @@ class FixedAssets extends SecureController{
 
         $json = [];
         $json['error']=0;
+        $json['errors'] = array('none'=> 'none');
+        $json['lists_errors'] = '';
+        $json['message'] = '';
         
         //Si no envio por post rechazar la solicitud
         if($this->request->getMethod()!="post"){                
             $json['message'] = "Invalid method";
             $json['error']=1;
+            $json['errors'] = "Error creating a new record...";
+            $json['lists_errors'] = '';
             return $this->respond($json, 500);
         }
 
@@ -101,53 +106,78 @@ class FixedAssets extends SecureController{
                 'key' => 'min_length[1]|max_length[15]',
             ];
 
-            /*
+            
             $errors = [
                 'user_name' => [
                     'is_unique' => 'Username already exists'
                 ]
-            ];
-            */
+            ];            
 
             if(!$this->validate($rules,$errors)){                
                 $json['error'] = 1;
                 $json['errors'] = $this->validator->getErrors();
                 $json['lists_errors'] = $this->validator->listErrors();
-            } else {
-                //Save user in DB
-                $user = new UserModel();
+                return $this->respond($json, 500);
+            }
 
-                $userData = [
-                    "user_name" => $this->request->getVar('user_name'),
-                    "first_name" => $this->request->getVar('first_name'),
-                    "last_name" => $this->request->getVar('last_name'),
-                    "job_description" => $this->request->getVar('job_description'),
-                    "email" => $this->request->getVar('email'),
-                    "password" => $this->request->getVar('password'),
-                    "contact_phone" => $this->request->getVar('contact_phone'),
-                ];
-                
-                $user->insert($userData);
-                
-                //Verify the insert
-                $userInserted = $user->find($userData['user_name']);
+            $insert = "
+            insert into ma_fixed_assets
+            (`description`,`part_number`,`brand`,`model`,`serial_no`,`import_petition`,`tariff_heading`,`key`,`remark`,`created_at`,`created_by`,`updated_at`,`updated_by`,`fixed_asset_status`)
+            values
+            (:description:,:part_number:,:brand:,:model:,:serial_no:,:import_petition:,:tariff_heading:,:key:,:remark:,now(),:created_by:,now(),:updated_by:,:fixed_asset_status:)
+            ";
 
-                if(!$userInserted){
-                    $json['error'] = 1;
-                    $json['errors'] = array('user_name'=> 'Error Creating a new user');
-                    $json['lists_errors'] = "<ul><li>Error creating a new user</li></ul>";
-                } else {
-                    $json['user_name'] = $userInserted['user_name'];
-                    $json['message'] = "New user added succesfully";
-                }
-                
-            }   
+            $json['sql'] = $insert;
 
+            $db->query($insert,[
+                'description' => $this->request->getVar('description'),
+                'part_number' => $this->request->getVar('part_number'),
+                'brand' => $this->request->getVar('brand'),
+                'model' => $this->request->getVar('model'),
+                'serial_no' => $this->request->getVar('serial_no'),
+                'import_petition' => $this->request->getVar('import_petition'),
+                'tariff_heading' => $this->request->getVar('tariff_heading'),
+                'key' => $this->request->getVar('key'),
+                'remark' => '',
+                'created_by' => session()->get('user_name'),
+                'updated_by' => session()->get('user_name'),
+                'fixed_asset_status' => 'Active',               
+            ]);
+
+            $id_fixed_asset = $db->insertID();
+
+            if(!$id_fixed_asset){
+                $json['error'] = 1;
+                $json['errors'] = array('fixed_asset'=> 'Error Creating a new record');
+                $json['lists_errors'] = '<ul><li>Error creating a new record</li></ul>';
+                return $this->respond($json, 500);
+            }
+
+            //Generar un hash
+            $hash_fixed_asset = md5("fixed_assets_".$id_fixed_asset);
+
+            $update = "
+            update ma_fixed_assets set hash_fixed_asset = '".$hash_fixed_asset."' where id_fixed_asset = $id_fixed_asset
+            ";
+
+            $db->query($update);
+
+            $select = "select * from ma_fixed_assets where id_fixed_asset = $id_fixed_asset ";
+
+            $query = $db->query($select);
+
+            $fixed_asset = $query->getRowArray();
+
+            $json['fixed_asset'] = $fixed_asset;
+            $json['message'] = "New record added succesfully";
+            return $this->respond($json, 200);
 
 
         }catch(Exception $e){
             $json['e'] = $e->getMessage();
-            $json['message'] = "Error saving new fixed assets";
+            $json['message'] = "Error saving new record";
+            $json['errors'] = array('fixed_asset'=> 'Error Creating a new record');
+            $json['lists_errors'] = '<ul><li>Error creating a new record</li></ul>';
             $json['error']=1;
             return $this->respond($json, 500);
         }
