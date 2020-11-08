@@ -1,4 +1,5 @@
                     <?= view_cell("App\Libraries\UIFixedAssets::NewModal") ?>
+					<?= view_cell("App\Libraries\UIFixedAssets::EditModal") ?>
                     <!--begin::Content-->
 					<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 						<!--begin::Subheader-->
@@ -119,7 +120,9 @@
                                                             <th>Serial No</th>
                                                             <th>Import Petition</th>
                                                             <th>Level</th>
-                                                            <th>Key</th>                                                            
+                                                            <th>Key</th>
+                                                            <th>QR</th>
+															<th>...</th>
                                                         </tr>
                                                     </thead>        
                                                 </table>                                                

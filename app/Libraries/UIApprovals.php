@@ -9,6 +9,10 @@ class UIApprovals {
         return view("approvals/approvals_view");
     }
 
+    public function Edit(){
+        return view("approvals/approvals_edit");
+    }
+
     public function List(){
         return view("approvals/approvals_list");
     }

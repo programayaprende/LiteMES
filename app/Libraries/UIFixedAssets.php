@@ -8,4 +8,8 @@ class UIFixedAssets {
     public function ViewModal(){
         return view("fixed_assets/fixed_assets_view_modal");
     }
+
+    public function EditModal(){
+        return view("fixed_assets/fixed_assets_edit_modal");
+    }
 }

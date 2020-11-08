@@ -22,6 +22,62 @@ class FixedAssets extends SecureController{
         echo view("templates/footer",$data);
     }
 
+    public function View(){
+        
+        $db = db_connect();
+
+        $json = [];
+        $json['error']=0;
+        $json['errors'] = array('none'=> 'none');
+        $json['lists_errors'] = '';
+        $json['message'] = '';
+
+        try {
+
+            if(!$this->request->getVar('id_fixed_asset')){
+                $json['error']=1;
+                $json['errors'] = array('none'=> 'none');
+                $json['lists_errors'] = 'Invalid UID';
+                $json['message'] = $json['lists_errors'];
+                return $this->respond($json, 500);
+            }
+
+            $select = "
+            select 
+                a.*
+            from ma_fixed_assets a left join ma_users b on a.updated_by = b.user_name 
+            where                     
+                a.fixed_asset_status not in ('Deleted')
+                and id_fixed_asset = :id_fixed_asset:
+            ";
+            
+            $query = $db->query($select,[
+                'id_fixed_asset' => $this->request->getVar('id_fixed_asset'),
+            ]);
+            
+            $fixed_asset = $query->getRowArray();
+
+            if(!$fixed_asset){
+                $json['error']=1;
+                $json['errors'] = array('none'=> 'none');
+                $json['lists_errors'] = 'Record not found';
+                $json['message'] = $json['lists_errors'];
+                return $this->respond($json, 500);
+            }
+
+            $json['fixed_asset'] = $fixed_asset;
+
+            return $this->respond($json, 200);
+
+        } catch(Exceptions $e){
+            $json['e'] = $e->getMessage();
+            $json['message'] = "Error getting fixed assets list";
+            $json['error']=1;
+            return $this->respond($json, 500);
+        }
+
+    }
+
     public function GetFixedAssets(){
         
         $db = db_connect();
@@ -86,8 +142,8 @@ class FixedAssets extends SecureController{
         if($this->request->getMethod()!="post"){                
             $json['message'] = "Invalid method";
             $json['error']=1;
-            $json['errors'] = "Error creating a new record...";
-            $json['lists_errors'] = '';
+            $json['errors'] = $json['message'];
+            $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
             return $this->respond($json, 500);
         }
 
@@ -115,6 +171,7 @@ class FixedAssets extends SecureController{
 
             if(!$this->validate($rules,$errors)){                
                 $json['error'] = 1;
+                $json['message'] = 'Validation error';
                 $json['errors'] = $this->validator->getErrors();
                 $json['lists_errors'] = $this->validator->listErrors();
                 return $this->respond($json, 500);
@@ -148,8 +205,9 @@ class FixedAssets extends SecureController{
 
             if(!$id_fixed_asset){
                 $json['error'] = 1;
-                $json['errors'] = array('fixed_asset'=> 'Error Creating a new record');
-                $json['lists_errors'] = '<ul><li>Error creating a new record</li></ul>';
+                $json['message'] = 'Error Creating a new record';
+                $json['errors'] = array('fixed_asset'=> $json['message']);
+                $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
                 return $this->respond($json, 500);
             }
 
@@ -175,9 +233,124 @@ class FixedAssets extends SecureController{
 
         }catch(Exception $e){
             $json['e'] = $e->getMessage();
-            $json['message'] = "Error saving new record";
-            $json['errors'] = array('fixed_asset'=> 'Error Creating a new record');
-            $json['lists_errors'] = '<ul><li>Error creating a new record</li></ul>';
+            $json['message'] = "Error creating new record";
+            $json['errors'] = array('fixed_asset'=> $json['message']);
+            $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
+            $json['error']=1;
+            return $this->respond($json, 500);
+        }
+    }
+
+    public function Edit(){
+        $db = db_connect();
+
+        $json = [];
+        $json['error']=0;
+        $json['errors'] = array('none'=> 'none');
+        $json['lists_errors'] = '';
+        $json['message'] = '';
+        
+        //Si no envio por post rechazar la solicitud
+        if($this->request->getMethod()!="post"){                
+            $json['message'] = "Invalid method";
+            $json['error']=1;
+            $json['errors'] = array('fixed_asset' => $json['message']);
+            $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
+            return $this->respond($json, 500);
+        }
+
+        try {
+
+            helper(['form']);
+            
+            $rules = [
+                'id_fixed_asset' => 'required',
+                'description' => 'required|min_length[3]|max_length[150]',
+                'part_number' =>  'required|min_length[3]|max_length[25]',
+                'brand' =>  'required|min_length[3]|max_length[25]',                
+                'model' =>  'required|min_length[3]|max_length[25]',
+                'serial_no' =>  'required|min_length[3]|max_length[30]',
+                'import_petition' => 'min_length[3]|max_length[50]',                
+                'tariff_heading' => 'min_length[1]|max_length[3]',
+                'key' => 'min_length[1]|max_length[15]',
+            ];
+
+            
+            $errors = [
+                'user_name' => [
+                    'is_unique' => 'Username already exists'
+                ]
+            ];            
+
+            if(!$this->validate($rules,$errors)){                
+                $json['error'] = 1;
+                $json['message'] = "Validation errors";
+                $json['errors'] = $this->validator->getErrors();
+                $json['lists_errors'] = $this->validator->listErrors();
+                return $this->respond($json, 500);
+            }
+
+            $update = "
+            update ma_fixed_assets
+            set 
+            `description` = :description:,
+            `part_number` = :part_number:,
+            `brand` = :brand:,
+            `model` = :model:,
+            `serial_no` = :serial_no:,
+            `import_petition` = :import_petition:,
+            `tariff_heading` = :tariff_heading:,
+            `key` = :key:,
+            `remark` = :remark:,
+            `updated_at` = now(),
+            `updated_by` = :updated_by:            
+            where `id_fixed_asset` = :id_fixed_asset:
+            limit 1
+            ";
+
+            $json['sql'] = $update;
+
+            $db->query($update,[
+                'id_fixed_asset' => $this->request->getVar('id_fixed_asset'),
+                'description' => $this->request->getVar('description'),
+                'part_number' => $this->request->getVar('part_number'),
+                'brand' => $this->request->getVar('brand'),
+                'model' => $this->request->getVar('model'),
+                'serial_no' => $this->request->getVar('serial_no'),
+                'import_petition' => $this->request->getVar('import_petition'),
+                'tariff_heading' => $this->request->getVar('tariff_heading'),
+                'key' => $this->request->getVar('key'),
+                'remark' => '',                
+                'updated_by' => session()->get('user_name'),                              
+            ]);
+
+            $affectedRows = $db->affectedRows();
+
+            if(!$affectedRows){
+                $json['error'] = 1;
+                $json['message'] = 'Error updating the record';
+                $json['errors'] = array('fixed_asset'=> $json['message']);
+                $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
+                return $this->respond($json, 500);
+            }
+
+
+            $select = "select * from ma_fixed_assets where id_fixed_asset = :id_fixed_asset: ";
+            $query = $db->query($select,[
+                'id_fixed_asset' => $this->request->getVar('id_fixed_asset'),
+            ]);
+            $fixed_asset = $query->getRowArray();
+
+            $json['fixed_asset'] = $fixed_asset;
+            $json['message'] = "Record updated succesfully";
+            return $this->respond($json, 200);
+
+
+        }catch(Exception $e){
+            $json['e'] = $e->getMessage();
+            $json['message'] = "Error during record updating";
+            $json['errors'] = array('fixed_asset'=> $json['message']);
+            $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
             $json['error']=1;
             return $this->respond($json, 500);
         }
