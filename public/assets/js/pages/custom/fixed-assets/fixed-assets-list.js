@@ -69,6 +69,12 @@ var KTAppsFixedAssetsListDatatable = function() {
                                             <span class="navi-text">Edit</span>\
                                         </a>\
                                     </li>\
+                                    <li class="navi-item">\
+                                        <a href="javascript://" data-id-fixed-asset="' + row.id_fixed_asset + '" class="navi-link show-delete-modal">\
+                                            <span class="navi-icon"><i class="la la-trash"></i></span>\
+                                            <span class="navi-text">Delete</span>\
+                                        </a>\
+                                    </li>\
                                 </ul>\
                             </div>\
                         </div>\
@@ -267,6 +273,87 @@ var KTAppsFixedAssetsListDatatable = function() {
 
         });
 
+        $(document).on('click','.show-delete-modal',function(){            
+            console.log("show-delete-modal");            
+            $("#deleteFixedAssetModal").modal("show");
+            var id_fixed_asset = $(this).attr("data-id-fixed-asset");
+            $('#form-delete-modal input[name="id_fixed_asset"]').val(id_fixed_asset);
+        });
+
+        $(".save-delete-modal").on("click",function(){
+            console.log("delete-modal");
+            $(this).attr("disabled", true);
+            
+            var formData = new FormData(document.getElementById("form-delete-modal"));
+
+            $.ajax({
+                url: BASE_URL + "/FixedAssets/Delete",
+                type: "post",
+                dataType: "json",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            .fail(function(jqXHR, textStatus, errorThrown ){                
+                console.log(textStatus);
+                console.log(jqXHR);
+                try{
+
+                    textStatus = jqXHR.responseJSON.lists_errors;
+                }catch(error){
+
+                }
+                swal.fire({
+                    html: "Sorry, looks like there are some errors detected, please try again. <br>" + textStatus + "",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                }).then(function() {
+                    KTUtil.scrollTop();
+                });
+                return;
+            })
+            .done(function(res){
+                //console.log(res);
+                if(res.error>0){
+                    swal.fire({
+                        html: "Sorry, looks like there are some errors detected, please try again." + res.lists_errors,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    }).then(function() {
+                        KTUtil.scrollTop();
+                    });
+                    return;
+                } else {
+                    swal.fire({
+                        text: res.message,
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    }).then(function() {                        
+                        $('#form-delete-modal').trigger("reset");
+                        $("#deleteFixedAssetModal").modal("hide");
+                        KTUtil.scrollTop();
+                        _refreshList();
+                    });
+                    return;
+                }
+            });
+            
+
+        });
+
         $(".save-edit-modal").on("click",function(){
             console.log("save-edit-modal");
             $(this).attr("disabled", true);
@@ -329,8 +416,8 @@ var KTAppsFixedAssetsListDatatable = function() {
                             confirmButton: "btn font-weight-bold btn-light-primary"
                         }
                     }).then(function() {                        
-                        $('#form-new-modal').trigger("reset");
-                        $("#newFixedAssetModal").modal("hide");
+                        $('#form-edit-modal').trigger("reset");
+                        $("#editFixedAssetModal").modal("hide");
                         KTUtil.scrollTop();
                         _refreshList();
                     });

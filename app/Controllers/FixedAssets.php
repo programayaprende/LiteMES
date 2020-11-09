@@ -227,7 +227,7 @@ class FixedAssets extends SecureController{
             $fixed_asset = $query->getRowArray();
 
             $json['fixed_asset'] = $fixed_asset;
-            $json['message'] = "New record added succesfully";
+            $json['message'] = "New record added successfully";
             return $this->respond($json, 200);
 
 
@@ -342,13 +342,104 @@ class FixedAssets extends SecureController{
             $fixed_asset = $query->getRowArray();
 
             $json['fixed_asset'] = $fixed_asset;
-            $json['message'] = "Record updated succesfully";
+            $json['message'] = "Record updated successfully";
             return $this->respond($json, 200);
 
 
         }catch(Exception $e){
             $json['e'] = $e->getMessage();
             $json['message'] = "Error during record updating";
+            $json['errors'] = array('fixed_asset'=> $json['message']);
+            $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
+            $json['error']=1;
+            return $this->respond($json, 500);
+        }
+    }
+
+
+    public function Delete(){
+        $db = db_connect();
+
+        $json = [];
+        $json['error']=0;
+        $json['errors'] = array('none'=> 'none');
+        $json['lists_errors'] = '';
+        $json['message'] = '';
+        
+        //Si no envio por post rechazar la solicitud
+        if($this->request->getMethod()!="post"){                
+            $json['message'] = "Invalid method";
+            $json['error']=1;
+            $json['errors'] = array('fixed_asset' => $json['message']);
+            $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
+            return $this->respond($json, 500);
+        }
+
+        try {
+
+            helper(['form']);
+            
+            $rules = [
+                'id_fixed_asset' => 'required',                
+            ];
+
+            
+            $errors = [
+                'user_name' => [
+                    'is_unique' => 'Username already exists'
+                ]
+            ];            
+
+            if(!$this->validate($rules,$errors)){                
+                $json['error'] = 1;
+                $json['message'] = "Validation errors";
+                $json['errors'] = $this->validator->getErrors();
+                $json['lists_errors'] = $this->validator->listErrors();
+                return $this->respond($json, 500);
+            }
+
+            $update = "
+            update ma_fixed_assets
+            set             
+            `updated_at` = now(),
+            `updated_by` = :updated_by:,
+            `fixed_asset_status` = 'Deleted'
+            where `id_fixed_asset` = :id_fixed_asset:
+            limit 1
+            ";
+
+            $json['sql'] = $update;
+
+            $db->query($update,[
+                'id_fixed_asset' => $this->request->getVar('id_fixed_asset'),
+                'updated_by' => session()->get('user_name'),                              
+            ]);
+
+            $affectedRows = $db->affectedRows();
+
+            if(!$affectedRows){
+                $json['error'] = 1;
+                $json['message'] = 'Error trying to delete the record';
+                $json['errors'] = array('fixed_asset'=> $json['message']);
+                $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
+                return $this->respond($json, 500);
+            }
+
+
+            $select = "select * from ma_fixed_assets where id_fixed_asset = :id_fixed_asset: ";
+            $query = $db->query($select,[
+                'id_fixed_asset' => $this->request->getVar('id_fixed_asset'),
+            ]);
+            $fixed_asset = $query->getRowArray();
+
+            $json['fixed_asset'] = $fixed_asset;
+            $json['message'] = "Record deleted successfully";
+            return $this->respond($json, 200);
+
+
+        }catch(Exception $e){
+            $json['e'] = $e->getMessage();
+            $json['message'] = "Error trying to delete the record";
             $json['errors'] = array('fixed_asset'=> $json['message']);
             $json['lists_errors'] = '<ul><li>'.$json['message'].'</li></ul>';
             $json['error']=1;

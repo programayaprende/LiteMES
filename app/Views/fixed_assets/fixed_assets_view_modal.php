@@ -14,46 +14,45 @@
                 <form id="form-view-modal">
                 
                     <input type="hidden" name="id_fixed_asset" value="">
-                    <div class="form-group">    
+                    <div class="form-group">
                         <label for="exampleTextarea">Description <span class="text-danger">*</span></label>
                         <textarea class="form-control" rows="3" name="description" disabled></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label>Part Number <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"  placeholder="Part Number" name="part_number"/>
+                        <input type="text" class="form-control"  placeholder="Part Number" name="part_number" disabled/>
                     </div>
 
                     <div class="form-group">
                         <label>Brand <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"  placeholder="Brand" name="brand"/>
+                        <input type="text" class="form-control"  placeholder="Brand" name="brand" disabled/>
                     </div>
 
                     <div class="form-group">
                         <label>Model <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"  placeholder="Model" name="model"/>
+                        <input type="text" class="form-control"  placeholder="Model" name="model" disabled/>
                     </div>
 
                     <div class="form-group">
                         <label>Serial No. <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"  placeholder="Serial No." name="serial_no"/>
+                        <input type="text" class="form-control"  placeholder="Serial No." name="serial_no" disabled/>
                     </div>
 
                     <div class="form-group">
                         <label>Import Petition</label>
-                        <input type="text" class="form-control"  placeholder="Import Petition" name="import_petition"/>
+                        <input type="text" class="form-control"  placeholder="Import Petition" name="import_petition" disabled/>
                     </div>
 
                     <div class="form-group">
                         <label>Tariff Heading</label>
-                        <input type="text" class="form-control"  placeholder="Tariff Heading" name="tariff_heading" maxlength="3"/>
+                        <input type="text" class="form-control"  placeholder="Tariff Heading" name="tariff_heading" maxlength="3" disabled/>
                     </div>
 
                     <div class="form-group">
                         <label>Key</label>
-                        <input type="text" class="form-control"  placeholder="Key" name="key"/>
+                        <input type="text" class="form-control"  placeholder="Key" name="key" disabled/>
                     </div>
-                    
                     
                 </form>
                 <!--end::Form-->

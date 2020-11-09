@@ -1,5 +1,7 @@
                     <?= view_cell("App\Libraries\UIFixedAssets::NewModal") ?>
 					<?= view_cell("App\Libraries\UIFixedAssets::EditModal") ?>
+					<?= view_cell("App\Libraries\UIFixedAssets::ViewModal") ?>
+					<?= view_cell("App\Libraries\UIFixedAssets::DeleteModal") ?>
                     <!--begin::Content-->
 					<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 						<!--begin::Subheader-->

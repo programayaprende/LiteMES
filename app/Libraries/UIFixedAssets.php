@@ -12,4 +12,8 @@ class UIFixedAssets {
     public function EditModal(){
         return view("fixed_assets/fixed_assets_edit_modal");
     }
+
+    public function DeleteModal(){
+        return view("fixed_assets/fixed_assets_delete_modal");
+    }
 }
