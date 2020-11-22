@@ -107,7 +107,7 @@
 						<!--end::Toolbar-->
 					</div>
 					<!--end::Brand-->
-					<?= view_cell("App\Libraries\UIComponents::SideMenu") ?>
+					<?= view_cell("App\Libraries\UIComponents::SideMenu",['ecode'=>session()->get('ecode')]) ?>
 				</div>
 				<!--end::Aside-->
 				<!--begin::Wrapper-->

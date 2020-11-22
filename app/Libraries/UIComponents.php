@@ -1,8 +1,8 @@
 <?php namespace App\Libraries;
 
 class UIComponents {
-    public function SideMenu(){
-        return view("templates/sidemenu");
+    public function SideMenu(array $params=[]){
+        return view("templates/sidemenu_".$params['ecode']);
     }
 
     public function TopMenu(){

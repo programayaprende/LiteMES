@@ -54,7 +54,7 @@ var KTLogin = function() {
 
             validation.validate().then(function(status) {
 		        if (status == 'Valid') {
-					$.post( "login/authenticating", $( "#kt_login_signin_form" ).serialize() , function(data){
+					$.post( BASE_URL + "/login/authenticating", $( "#kt_login_signin_form" ).serialize() , function(data){
 						if(data.error > 0){
 							swal.fire({
 								html: "Sorry, looks like there are some errors detected, please try again." + data.errors,
@@ -81,7 +81,7 @@ var KTLogin = function() {
 						}).then(function() {
 							//Go To Dashboard
 							KTUtil.scrollTop();
-							window.location.href = "Dashboard";
+							window.location.href = BASE_URL + "/Dashboard";
 						});
 
 					}, 'json');

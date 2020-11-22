@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<!--begin::Head-->
-	<head><base href="../../../../">
+	<head><base href="<?=base_url()?>/">
 		<meta charset="utf-8" />
 		<title>LiteMES | <?=lang('Login.loginLogIn',[],session()->get('loc'))?></title>
 		<meta name="description" content="Login page example" />
@@ -11,18 +11,18 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
 		<!--end::Fonts-->
 		<!--begin::Page Custom Styles(used by this page)-->
-		<link href="assets/css/pages/login/classic/login-2.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/pages/login/classic/login-2.css" rel="stylesheet" type="text/css" />
 		<!--end::Page Custom Styles-->
 		<!--begin::Global Theme Styles(used by all pages)-->
-		<link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
-		<link href="assets/plugins/custom/prismjs/prismjs.bundle.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/plugins/custom/prismjs/prismjs.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 		<!--end::Global Theme Styles-->
 		<!--begin::Layout Themes(used by all pages)-->
-		<link href="assets/css/themes/layout/header/base/light.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/themes/layout/header/menu/light.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/themes/layout/brand/dark.css" rel="stylesheet" type="text/css" />
-		<link href="assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/header/base/light.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/header/menu/light.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/brand/dark.css" rel="stylesheet" type="text/css" />
+		<link href="<?=base_url()?>/assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css" />
 		<!--end::Layout Themes-->
 		<link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
 	</head>
@@ -40,7 +40,7 @@
 						<!--begin::Aside body-->
 						<div class="d-flex flex-column-fluid flex-column flex-center mt-5 mt-lg-0">
 							<a href="#" class="mb-15 text-center">
-								<img src="assets/media/logos/logo-letter-1.png" class="max-h-75px" alt="" />
+								<img src="<?=base_url()?>/assets/media/logos/logo-letter-1.png" class="max-h-75px" alt="" />
 							</a>
 							<!--begin::Signin-->
 							<div class="login-form login-signin">
@@ -51,6 +51,9 @@
 								<!--begin::Form-->
 								<form class="form" novalidate="novalidate" id="kt_login_signin_form">
 									<div class="form-group py-3 m-0">
+										<input class="form-control h-auto border-0 px-0 placeholder-dark-75" type="text" placeholder="E-Code" name="ecode" autocomplete="off" />
+									</div>									
+									<div class="form-group py-3 border-top m-0">
 										<input class="form-control h-auto border-0 px-0 placeholder-dark-75" type="Email" placeholder="Email" name="email" autocomplete="off" />
 									</div>
 									<div class="form-group py-3 border-top m-0">
@@ -155,8 +158,8 @@
 					<div class="d-flex flex-column-fluid flex-lg-center">
 						<div class="d-flex flex-column justify-content-center">
 							<h3 class="display-3 font-weight-bold my-7 text-white">Welcome to LiteMES!</h3>
-							<p class="font-weight-bold font-size-lg text-white opacity-80">Lite Manufacturing Execution System
-							<br />framework for small manufacturing companies.</p>
+							<p class="font-weight-bold font-size-lg text-white opacity-80">Lite Management Enterprise Software
+							<br />for small enterprises to does big things</p>
 						</div>
 					</div>
 					<!--end::Content body-->
@@ -168,15 +171,16 @@
 		<!--end::Main-->
 		<!--begin::Global Config(global config for global JS scripts)-->
 		<script>var KTAppSettings = { "breakpoints": { "sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400 }, "colors": { "theme": { "base": { "white": "#ffffff", "primary": "#3699FF", "secondary": "#E5EAEE", "success": "#1BC5BD", "info": "#8950FC", "warning": "#FFA800", "danger": "#F64E60", "light": "#E4E6EF", "dark": "#181C32" }, "light": { "white": "#ffffff", "primary": "#E1F0FF", "secondary": "#EBEDF3", "success": "#C9F7F5", "info": "#EEE5FF", "warning": "#FFF4DE", "danger": "#FFE2E5", "light": "#F3F6F9", "dark": "#D6D6E0" }, "inverse": { "white": "#ffffff", "primary": "#ffffff", "secondary": "#3F4254", "success": "#ffffff", "info": "#ffffff", "warning": "#ffffff", "danger": "#ffffff", "light": "#464E5F", "dark": "#ffffff" } }, "gray": { "gray-100": "#F3F6F9", "gray-200": "#EBEDF3", "gray-300": "#E4E6EF", "gray-400": "#D1D3E0", "gray-500": "#B5B5C3", "gray-600": "#7E8299", "gray-700": "#5E6278", "gray-800": "#3F4254", "gray-900": "#181C32" } }, "font-family": "Poppins" };</script>
-		<script src="assets/js/language/<?=session()->get('loc')?>.js"></script>
+		<script>var BASE_URL = "<?= base_url() ?>";</script>
+		<script src="<?=base_url()?>/assets/js/language/<?=session()->get('loc')?>.js"></script>
 		<!--end::Global Config-->
 		<!--begin::Global Theme Bundle(used by all pages)-->
-		<script src="assets/plugins/global/plugins.bundle.js"></script>
-		<script src="assets/plugins/custom/prismjs/prismjs.bundle.js"></script>
-		<script src="assets/js/scripts.bundle.js"></script>
+		<script src="<?=base_url()?>/assets/plugins/global/plugins.bundle.js"></script>
+		<script src="<?=base_url()?>/assets/plugins/custom/prismjs/prismjs.bundle.js"></script>
+		<script src="<?=base_url()?>/assets/js/scripts.bundle.js"></script>
 		<!--end::Global Theme Bundle-->
 		<!--begin::Page Scripts(used by this page)-->
-		<script src="assets/js/pages/custom/login/login-general.js"></script>
+		<script src="<?=base_url()?>/assets/js/pages/custom/login/login-general.js"></script>
 		<!--end::Page Scripts-->
 	</body>
 	<!--end::Body-->

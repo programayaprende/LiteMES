@@ -29,11 +29,12 @@ class Login extends BaseController
         $data['error'] = 0;
 
         helper(['form']);
-
+        
         if($this->request->getMethod() == "post"){
             $rules = [
                 'email' => 'required|min_length[6]|max_length[50]|valid_email',
                 'password' => 'required|min_length[8]|max_length[50]|validateUser[email,password]',
+                'ecode' => 'required|min_length[4]|max_length[100]',
             ];
 
             
@@ -46,7 +47,7 @@ class Login extends BaseController
 
             if(!$this->validate($rules,$errors)){
                 $data['errors'] = $this->validator->listErrors();
-                $data['error'] = 1;                
+                $data['error'] = 1;
             } else {
                 $model = new UserModel();
                 $user = $model->where('email',$this->request->getVar('email'))
@@ -81,6 +82,7 @@ class Login extends BaseController
             'ip_address' => $_SERVER['REMOTE_ADDR'],
             'loc' => session()->get('loc'),
             'user_name' => $user['user_name'],
+            'ecode' => $_POST['ecode'],
         ];
 
         session()->set($data);
