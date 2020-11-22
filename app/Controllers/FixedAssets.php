@@ -228,6 +228,21 @@ class FixedAssets extends SecureController{
 
             $json['fixed_asset'] = $fixed_asset;
             $json['message'] = "New record added successfully";
+
+            //$json['qr_path'] = base_url()."/phpqrcode/litemes.php";
+
+            //Creando QR Code
+
+            $qrData = "PEDIMENTO: ".
+
+            $qr_code_file_content = file_get_contents(base_url()."/phpqrcode/litemes.php?data=" . $qrData);
+
+            $file_path = WRITEPATH.'c100/uploads/fixed_assets/qr/'.$id_fixed_asset.'.png';
+
+            $json['qr_path'] = $file_path;
+
+            file_put_contents($file_path,$qr_code_file_content);
+
             return $this->respond($json, 200);
 
 

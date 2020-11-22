@@ -39,6 +39,7 @@ var KTAppsFixedAssetsListDatatable = function() {
                     data: "id_fixed_asset",
                     render: function(data, type, row, meta) {
                         return "QR";
+                        //return "<img src='" + BASE_URL + "/phpqrcode/litemes.php'>";
                     }
                 },
                 { 
